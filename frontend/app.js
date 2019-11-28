@@ -1,7 +1,8 @@
-const keywords = ['bzdury', 'Zanim', 'do'];
-const menu = document.getElementById("openNaturalSearch");
-document.cookie = `filter-account-cookie=filter-cookie-hash; expires=Thu, 01 Jan 1970 00:00:00 UTC;`
-
+// ==UserScript==
+// @name     FilterApp
+// @version  1
+// @grant    none
+// ==/UserScript==
 
 const loginElement = `
 <div>
@@ -27,17 +28,29 @@ const loginElement = `
 </div>
 `;
 
+let keywords = ['bzdury', 'Zanim', 'do'];
+const menu = document.getElementById("openNaturalSearch");
+document.cookie = `filter-account-cookie=filter-cookie-hash; expires=Thu, 01 Jan 1970 00:00:00 UTC;`
+
+
+
 const wordListElement = `
 <div>
 	<ul class="newregister-drop">
    	<li>
-<div class="width-one-third inlblk vertical-top m-reset-width m-set-fullwidth">
-		<h4>Chmura tagów</h4>
-		<div>
-			<a class="x-small tag create" href="https://www.wykop.pl/tag/hardware/" title="hardware">hardware</a> <a class="x-small tag create" href="https://www.wykop.pl/tag/humor/" title="humor">humor</a> <a class="normal tag create" href="https://www.wykop.pl/tag/internet/" title="internet">internet</a> <a class="large tag create" href="https://www.wykop.pl/tag/technologia/" title="technologia">technologia</a> <a class="xx-large tag create" href="https://www.wykop.pl/tag/rozrywka/" title="rozrywka">rozrywka</a> <a class="normal tag create" href="https://www.wykop.pl/tag/nauka/" title="nauka">nauka</a> <a class="normal tag create" href="https://www.wykop.pl/tag/programowanie/" title="programowanie">programowanie</a> <a class="x-small tag create" href="https://www.wykop.pl/tag/software/" title="software">software</a> <a class="normal tag create" href="https://www.wykop.pl/tag/sztuka/" title="sztuka">sztuka</a> <a class="x-small tag create" href="https://www.wykop.pl/tag/4konserwy/" title="4konserwy">4konserwy</a> <a class="x-small tag create" href="https://www.wykop.pl/tag/bekazpisu/" title="bekazpisu">bekazpisu</a> <a class="x-big tag create" href="https://www.wykop.pl/tag/ciekawostki/" title="ciekawostki">ciekawostki</a> <a class="large tag create" href="https://www.wykop.pl/tag/ekonomia/" title="ekonomia">ekonomia</a> <a class="xx-large tag create" href="https://www.wykop.pl/tag/europa/" title="europa">europa</a> <a class="x-small tag create" href="https://www.wykop.pl/tag/finanse/" title="finanse">finanse</a> <a class="x-small tag create" href="https://www.wykop.pl/tag/gospodarka/" title="gospodarka">gospodarka</a> <a class="x-small tag create" href="https://www.wykop.pl/tag/gry/" title="gry">gry</a> <a class="normal tag create" href="https://www.wykop.pl/tag/hahard/" title="hahard">hahard</a> <a class="large tag create" href="https://www.wykop.pl/tag/heheszki/" title="heheszki">heheszki</a> <a class="large tag create" href="https://www.wykop.pl/tag/historia/" title="historia">historia</a> <a class="normal tag create" href="https://www.wykop.pl/tag/kultura/" title="kultura">kultura</a> <a class="normal tag create" href="https://www.wykop.pl/tag/motoryzacja/" title="motoryzacja">motoryzacja</a> <a class="x-small tag create" href="https://www.wykop.pl/tag/pieniadze/" title="pieniadze">pieniadze</a> <a class="x-small tag create" href="https://www.wykop.pl/tag/pilkanozna/" title="pilkanozna">pilkanozna</a> <a class="x-small tag create" href="https://www.wykop.pl/tag/policja/" title="policja">policja</a> <a class="xx-large tag create" href="https://www.wykop.pl/tag/polityka/" title="polityka">polityka</a> <a class="xx-big tag create" href="https://www.wykop.pl/tag/polska/" title="polska">polska</a> <a class="x-small tag create" href="https://www.wykop.pl/tag/prawo/" title="prawo">prawo</a> <a class="x-small tag create" href="https://www.wykop.pl/tag/rosja/" title="rosja">rosja</a> <a class="normal tag create" href="https://www.wykop.pl/tag/samochody/" title="samochody">samochody</a> <a class="normal tag create" href="https://www.wykop.pl/tag/sport/" title="sport">sport</a> <a class="x-big tag create" href="https://www.wykop.pl/tag/swiat/" title="swiat">swiat</a> <a class="normal tag create" href="https://www.wykop.pl/tag/usa/" title="usa">usa</a> <a class="x-small tag create" href="https://www.wykop.pl/tag/wykop/" title="wykop">wykop</a> <a class="large tag create" href="https://www.wykop.pl/tag/zainteresowania/" title="zainteresowania">zainteresowania</a> <a class="x-small tag create" href="https://www.wykop.pl/tag/zdrowie/" title="zdrowie">zdrowie</a> 		</div>
-	</div>
+
+<div  id="keyword-list" class="inlblk vertical-top m-reset-width">
+<input /><input type="button" value="Dodaj">
+</div>
+<div id="keyword-list" class="inlblk vertical-top m-reset-width"></div>
 </li>
 	</ul>
+</div>
+`;
+
+const keyWordElementTemplate = `
+<div class="inlblk">
+	<a class="tag affect create" style="margin-rigth:10px;"><p style="display:inline;">Test dddd</p><i class="fa fa-times red" style="margin-left:5px;"></i></a>
 </div>
 `;
 
@@ -56,6 +69,25 @@ function isLogged () {
     .find(e => e === "filter-account-cookie"));
 }
 
+function addKeyWordsMenu() {
+	const filterMenu = document.getElementById("filterMenu");
+  filterMenu.innerHTML = wordListElement;
+  const list = document.getElementById("keyword-list");
+  keywords.forEach((keyword) => {
+    const element = document.createElement("div");
+    element.classList.add("inlblk");
+    element.innerHTML = `<a class="tag affect create" style="margin-rigth:10px;"><p style="display:inline;"></p><i class="fa fa-times red" style="margin-left:5px;"></i></a>`;
+    list.appendChild(element);
+    [...list.getElementsByTagName("p")].pop().innerText = keyword;
+  });
+  [...list.getElementsByTagName("i")].forEach((closeButton) => {
+  	closeButton.addEventListener("click", () => {
+    	const removedKeyWord = closeButton.parentNode.innerText;
+      closeButton.parentNode.parentNode.remove();
+      keywords = keywords.filter(kw => kw !== removedKeyWord);
+    });
+  });
+}
 function appendLoginForm() {
 	if (isLogged()) return;
 	const filterMenu = document.getElementById("filterMenu");
@@ -63,9 +95,8 @@ function appendLoginForm() {
   const loginForm = document.getElementById("filterLoginForm");
   loginForm.addEventListener("submit", (e) => {
   	e.preventDefault();
-    console.info("login");
-		document.cookie = `filter-account-cookie=filter-cookie-hash; expires=Thu, 01 Jan 2200 00:00:00 UTC;`
-    filterMenu.innerHTML = wordListElement;
+		document.cookie = `filter-account-cookie=filter-cookie-hash; expires=Thu, 01 Jan 2200 00:00:00 UTC;`;
+    addKeyWordsMenu();
   });
 }
 
@@ -74,7 +105,7 @@ function toggleMenu(e) {
   if (filterMenu.style.display === "block") {
     filterMenu.style.display = "none";
   } else {
-  	filterMenu.style.display = "block"; 
+  	filterMenu.style.display = "block";
   }
 };
 
@@ -102,10 +133,10 @@ elements.forEach(element => {
 const addPicker = function (e) {
   const color = e.style.color;
 	e.parentNode.addEventListener('mouseover', function () {
-  	e.style.color = 'red'; 
+  	e.style.color = 'red';
   });
   e.parentNode.addEventListener('mouseout', function () {
-    e.style.color = color; 
+    e.style.color = color;
   });
   e.parentNode.addEventListener('click', function () {
     e.innerHTML = 'Ten komentarz został zablokowany';
