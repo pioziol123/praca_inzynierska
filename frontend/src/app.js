@@ -4,29 +4,7 @@
 // @grant    none
 // ==/UserScript==
 
-const loginElement = `
-<div>
-	<ul class="newregister-drop">
-   <li>
-      <form id="filterLoginForm">
-				<div>
-				<label for="newregister-login">Login</label>
-					<input type="text" name="user[username]" id="newregister-login">
-        </div>
-        <div>
-          <label for="newregister-pass">Hasło</label>
-          <input type="password" name="user[password]" id="newregister-pass">
-        </div>
-        <fieldset class="row buttons">
-          <p>
-            <input type="submit" value="Zaloguj się">
-          </p>
-        </fieldset>
-      </form>
-		</li>
-	</ul>
-</div>
-`;
+import Login from "./components/login.component.js"
 
 let keywords = ['bzdury', 'Zanim', 'do'];
 const menu = document.getElementById("openNaturalSearch");
@@ -57,7 +35,7 @@ const keyWordElementTemplate = `
 const menuElement = document.createElement("li");
 menuElement.innerHTML = `
 <a id="filterMenuLink">Filter</a>
-<div id="filterMenu" class="dropdown right" style="margin-left:-230px;" />
+<div is="main-div" id="filterMenu" class="dropdown right" style="margin-left:-230px;" />
 `;
 menu.parentNode.parentNode.appendChild(menuElement);
 
@@ -89,9 +67,8 @@ function addKeyWordsMenu() {
   });
 }
 function appendLoginForm() {
-	if (isLogged()) return;
-	const filterMenu = document.getElementById("filterMenu");
-  filterMenu.innerHTML = loginElement;
+  if (isLogged()) return;
+  customElements.define('main-div', Login);
   const loginForm = document.getElementById("filterLoginForm");
   loginForm.addEventListener("submit", (e) => {
   	e.preventDefault();

@@ -1,2 +1,2 @@
 #!/bin/bash
-docker run -v `pwd`:/root  --rm=true nbuilder ls -la
+docker run -v `pwd`:/root  --rm=true nbuilder webpack --config=webpack.config.js
