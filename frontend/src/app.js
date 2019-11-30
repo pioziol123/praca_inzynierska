@@ -5,6 +5,7 @@
 // ==/UserScript==
 
 import Login from "./components/login.component.js"
+import WordList from "./components/wordlist.component"
 
 let keywords = ['bzdury', 'Zanim', 'do'];
 const menu = document.getElementById("openNaturalSearch");
@@ -12,19 +13,19 @@ document.cookie = `filter-account-cookie=filter-cookie-hash; expires=Thu, 01 Jan
 
 
 
-const wordListElement = `
-<div>
-	<ul class="newregister-drop">
-   	<li>
+// const wordListElement = `
+// <div>
+// 	<ul class="newregister-drop">
+//    	<li>
 
-<div  id="keyword-list" class="inlblk vertical-top m-reset-width">
-<input /><input type="button" value="Dodaj">
-</div>
-<div id="keyword-list" class="inlblk vertical-top m-reset-width"></div>
-</li>
-	</ul>
-</div>
-`;
+// <div  id="keyword-list" class="inlblk vertical-top m-reset-width">
+// <input /><input type="button" value="Dodaj">
+// </div>
+// <div id="keyword-list" class="inlblk vertical-top m-reset-width"></div>
+// </li>
+// 	</ul>
+// </div>
+// `;
 
 const keyWordElementTemplate = `
 <div class="inlblk">
@@ -48,8 +49,8 @@ function isLogged () {
 }
 
 function addKeyWordsMenu() {
-	const filterMenu = document.getElementById("filterMenu");
-  filterMenu.innerHTML = wordListElement;
+  customElements.define('main-div', WordList);
+
   const list = document.getElementById("keyword-list");
   keywords.forEach((keyword) => {
     const element = document.createElement("div");
