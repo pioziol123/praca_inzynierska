@@ -1,3 +1,5 @@
+import WordList from "./wordlist.component";
+
 const template = `
 <div>
 	<ul class="newregister-drop">
@@ -21,12 +23,26 @@ const template = `
 	</ul>
 </div>
 `;
-
-class Login extends HTMLElement {
+class Login extends HTMLDivElement {
   constructor() {
     super();
+    this.id = "main-div";
+    this.setAttribute("class", "dropdown right");
+    this.style = "margin-left:-230px;";
     this.innerHTML = template;
+  }
+
+  connectedCallback() {
+    this.querySelector("#filterLoginForm").addEventListener("submit", e => {
+      e.preventDefault();
+      document.cookie = `filter-account-cookie=filter-cookie-hash; expires=Thu, 01 Jan 2200 00:00:00 UTC;`;
+      this.parentElement.replaceChild(
+        document.createElement("div", { is: "word-list-component" }),
+        this
+      );
+    });
   }
 }
 
+customElements.define("login-component", Login, { extends: "div" });
 export default Login;
