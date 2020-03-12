@@ -1,6 +1,6 @@
 from resources import app
 from resources.forms import LoginForm
-from flask import flash, redirect, render_template
+from flask import flash, redirect, render_template, request
 
 
 ### Endpoints
@@ -14,6 +14,7 @@ from flask import flash, redirect, render_template
 def hello_world():
     return 'I am on Azure!'
 
+
 @app.route('/login', method='POST')
 def login():
     form = LoginForm()
@@ -22,3 +23,30 @@ def login():
             form.username.data, form.remember_me.data))
         return redirect('/index')
     return render_template(form=form)
+
+
+@app.route('/logout', method='POST')
+def logout():
+    return 'dupa'
+
+
+@app.route('/user', method='POST')
+def register():
+    return ''
+
+
+@app.route('/keywords', method='POST')
+def add_keyword():
+    return 'aa'
+
+
+@app.route('/keywords', method='GET')
+def list_keywords():
+    uname = request.form['uname']
+    mail = request.form['mail']
+    passw = request.form['passw']
+
+
+@app.route('/keywords/{id}', method='DELETE')
+def remove_keyword():
+    return 'success'
