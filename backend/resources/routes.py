@@ -1,14 +1,23 @@
-from resources import app
-from resources.forms import LoginForm
-from flask import flash, redirect, render_template, request
+from flask_sqlalchemy import SQLAlchemy
+from pip._vendor.requests.auth import HTTPBasicAuth
 
+from resources import app, db
+from resources.forms import LoginForm
+from flask import flash, redirect, render_template, request, abort, jsonify, url_for
 
 ### Endpoints
 # 1. '/'
 # 2. '/login' (method = GET)
 # 3. '/toggle
 # 4. '/fetch_words (method = GET)
-# 5. 
+# 5.
+from resources.models.models import User
+
+
+# extensions
+db = SQLAlchemy(app)
+auth = HTTPBasicAuth()
+
 
 @app.route('/')
 def hello_world():
@@ -32,7 +41,17 @@ def logout():
 
 @app.route('/user', method='POST')
 def register():
-    return ''
+    username = request.json.get('username')
+    password = request.json.get('password')
+    if username is None or password is None:
+        abort(400)  # missing arguments
+    if User.query.filter_by(username=username).first() is not None:
+        abort(400)  # existing user
+    user = User(username=username)
+    user.hash_password(password)
+    db.session.add(user)
+    db.session.commit()
+    return jsonify({'username': user.username}), 201, {'Location': url_for('get_user', id =user.id, _external=True)}
 
 
 @app.route('/keywords', method='POST')
