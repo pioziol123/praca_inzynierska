@@ -1,71 +1,71 @@
+import datetime
+
+from flask_jwt_extended import create_access_token
 from flask_sqlalchemy import SQLAlchemy
-from pip._vendor.requests.auth import HTTPBasicAuth
 
 from resources import app, db
-from resources.forms import LoginForm
-from flask import flash, redirect, render_template, request, abort, jsonify, url_for
+from flask import  request, abort, jsonify, url_for
 
-### Endpoints
-# 1. '/'
-# 2. '/login' (method = GET)
-# 3. '/toggle
-# 4. '/fetch_words (method = GET)
-# 5.
-from resources.models.models import User
+from resources.models.user import User
 
 
 # extensions
 db = SQLAlchemy(app)
-auth = HTTPBasicAuth()
+
+class Routes():
+
+    @app.route('/')
+    def hello_world(self):
+        return 'I am on Azure!'
+
+    @app.route('/login', methods=['POST'])
+    def login(self):
+        body = request.get_json()
+        user = User.objects.get(email=body.get('email'))
+        authorized = user.check_password(body.get('password'))
+        if not authorized:
+            return {'error': 'Email or password invalid'}, 401
+
+        expires = datetime.timedelta(days=7)
+        access_token = create_access_token(identity=str(user.id), expires_delta=expires)
+        return {'token': access_token}, 200
+
+    @app.route('/logout', methods=['POST'])
+    def logout(self):
+        return 'dupa'
+
+    @app.route('/user', methods=['POST'])
+    def register(self):
+        username = request.json.get('username')
+        password = request.json.get('password')
+        if username is None or password is None:
+            abort(400)  # missing arguments
+        if User.query.filter_by(username=username).first() is not None:
+            abort(400)  # existing user
+        user = User(username=username)
+        user.hash_password(password)
+        db.session.add(user)
+        db.session.commit()
+        return jsonify({'username': user.username}), 201, {'Location': url_for('get_user', id=user.id, _external=True)}
+
+    @app.route('/keywords', methods=['POST'])
+    def add_keyword(self):
+        return 'aa'
+
+    @app.route('/keywords', methods=['GET'])
+    def list_keywords(self):
+        uname = request.form['uname']
+        mail = request.form['mail']
+        passw = request.form['passw']
+
+    @app.route('/keywords/{id}', methods=['DELETE'])
+    def remove_keyword(self):
+        return 'success'
+
+    def init_endpoints(api):
+        return 'aaaawaria'
 
 
-@app.route('/')
-def hello_world():
-    return 'I am on Azure!'
 
 
-@app.route('/login', method='POST')
-def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        flash('Login requested for user {}, remember_me={}'.format(
-            form.username.data, form.remember_me.data))
-        return redirect('/index')
-    return render_template(form=form)
 
-
-@app.route('/logout', method='POST')
-def logout():
-    return 'dupa'
-
-
-@app.route('/user', method='POST')
-def register():
-    username = request.json.get('username')
-    password = request.json.get('password')
-    if username is None or password is None:
-        abort(400)  # missing arguments
-    if User.query.filter_by(username=username).first() is not None:
-        abort(400)  # existing user
-    user = User(username=username)
-    user.hash_password(password)
-    db.session.add(user)
-    db.session.commit()
-    return jsonify({'username': user.username}), 201, {'Location': url_for('get_user', id =user.id, _external=True)}
-
-
-@app.route('/keywords', method='POST')
-def add_keyword():
-    return 'aa'
-
-
-@app.route('/keywords', method='GET')
-def list_keywords():
-    uname = request.form['uname']
-    mail = request.form['mail']
-    passw = request.form['passw']
-
-
-@app.route('/keywords/{id}', method='DELETE')
-def remove_keyword():
-    return 'success'

@@ -12,4 +12,4 @@ migrate = Migrate(app, db)
 login = LoginManager(app)
 
 from resources import routes
-from resources.models import models
+from resources.models import user
