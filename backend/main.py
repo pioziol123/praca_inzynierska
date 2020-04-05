@@ -4,7 +4,7 @@ from flask import Flask, request, abort, jsonify, url_for
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token
 from resources.models.db import db
-from resources.models.user import User, Movie
+from resources.models.user import User, Keywords
 
 app = Flask(__name__)
 
@@ -14,30 +14,29 @@ jwt = JWTManager(app)
 
 @app.shell_context_processor
 def make_shell_context():
-    return {'User': User, 'Dictionary': Movie}
+    return {'User': User, 'Keywords': Keywords}
 
 
 @app.route('/login', methods=['POST'])
 def login(self):
     body = request.get_json()
-    user = User.objects.get(email=body.get('email'))
-    authorized = user.check_password(body.get('password'))
+    email = User.objects.get(email=body.get('email'))
+    authorized = email.check_password(body.get('password'))
     if not authorized:
         return {'error': 'Email or password invalid'}, 401
-
     expires = datetime.timedelta(days=7)
-    access_token = create_access_token(identity=str(user.id), expires_delta=expires)
+    access_token = create_access_token(identity=str(email.id), expires_delta=expires)
     return {'token': access_token}, 200
 
 
 @app.route('/logout', methods=['POST'])
 def logout(self):
-    return 'Log out has ben'
+    return 'An user has been logged out successfully'
 
 
 @app.route('/user', methods=['POST'])
-def register(self):
-    username = request.json.get('username')
+def register():
+    username = request.json.get('email')
     password = request.json.get('password')
     if username is None or password is None:
         abort(400)  # missing arguments
@@ -52,8 +51,10 @@ def register(self):
 
 @app.route('/keywords', methods=['POST'])
 def add_keyword():
-    return 'aa'
-
+    keyword = request.json.get('keyword')
+    if keyword is None:
+        abort(400)
+    db.session.add(keyword)
 
 @app.route('/keywords', methods=['GET'])
 def list_keywords(self):
@@ -64,12 +65,11 @@ def list_keywords(self):
 
 @app.route('/keywords/{id}', methods=['DELETE'])
 def remove_keyword(self):
-    return 'success'
+    keyword = request.json.get('keyword')
+    if keyword is None:
+        abort(400)
 
 
-@app.route('/')
-def hello_world():
-    return 'I am on Azure!'
 
 
 if __name__ == '__main__':
