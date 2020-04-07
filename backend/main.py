@@ -3,8 +3,8 @@ import datetime
 from flask import Flask, request, abort, jsonify, url_for
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token
-from resources.models.db import db
-from resources.models.user import User, Keywords
+from app import db
+from app.models.user import Users, Keywords
 
 app = Flask(__name__)
 
@@ -56,6 +56,7 @@ def add_keyword():
         abort(400)
     db.session.add(keyword)
 
+
 @app.route('/keywords', methods=['GET'])
 def list_keywords(self):
     uname = request.form['uname']
@@ -68,8 +69,6 @@ def remove_keyword(self):
     keyword = request.json.get('keyword')
     if keyword is None:
         abort(400)
-
-
 
 
 if __name__ == '__main__':

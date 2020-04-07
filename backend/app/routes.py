@@ -1,18 +1,13 @@
 import datetime
 
 from flask_jwt_extended import create_access_token
-from flask_sqlalchemy import SQLAlchemy
+from app import app, db
+from flask import request, abort, jsonify, url_for
 
-from resources import app, db
-from flask import  request, abort, jsonify, url_for
-
-from resources.models.user import User
+from app.models.user import Users
 
 
-# extensions
-db = SQLAlchemy(app)
-
-class Routes():
+class Routes:
 
     @app.route('/')
     def hello_world(self):
@@ -64,8 +59,3 @@ class Routes():
 
     def init_endpoints(api):
         return 'aaaawaria'
-
-
-
-
-
