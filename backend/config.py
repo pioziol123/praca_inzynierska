@@ -2,7 +2,9 @@
 # The other elements are the same as used in the tutorial
 # format: (user):(password)@(db_identifier).amazonaws.com:3306/(db_name)
 
-SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://flaskdemo:flaskdemo@flaskdemo.cwsaehb7ywmi.us-east-1.rds.amazonaws.com:3306/flaskdemo'
+APP_DEBUG = True
+
+SQLALCHEMY_DATABASE_URI = 'mysql://root:R5bSxurJxkHL7E32voVFSHicUtPtawox7hnMiGtPX@database-2.cqb08tr5s18b.eu-central-1.rds.amazonaws.com:3306/backendDb'
 
 SQLALCHEMY_POOL_RECYCLE = 3600
 
