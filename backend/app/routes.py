@@ -33,10 +33,15 @@ def logout(self):
 def register():
     email = request.json.get('username')
     password = request.json.get('password')
-    if email is None or password is None:
-        abort(Response('dupa'))  # missing arguments
+    repeat_password = request.json.get('repeat_password')
+    if email is None:
+        abort(Response('Brak adresu email')) # missing arguments
+    if password is None or repeat_password is None:
+        abort(Response('Nie podano hasla prawidlowo.'))
+    if password != repeat_password:
+        abort(Response('Haslo sie nie zgadza.'))
     if Users.query.filter_by(email=email).first() is not None:
-        abort(Response('huj'))  # existing user
+        abort(Response('Taki uzytkownik juz istnieje.'))  # existing user
     user = Users(email=email)
     user.email = email
     user.test_hash_password(password)
@@ -44,7 +49,7 @@ def register():
     user.last_login = datetime.datetime.now()
     db.session.add(user)
     db.session.commit()
-    return jsonify({'username': user.email}), 201, {'Location': 'dupa'}
+    return jsonify({'username': user.email}), 201, {'Location': 'Poznan'}
 
 
 @app.route('/keywords', methods=['POST'])
