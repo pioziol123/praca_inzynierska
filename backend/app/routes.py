@@ -72,3 +72,7 @@ def remove_keyword(self):
     keyword = request.json.get('keyword')
     if keyword is None:
         abort(400)
+
+@app.route('/', methods=['GET'])
+def hello_world(self):
+    return 'hello world'
