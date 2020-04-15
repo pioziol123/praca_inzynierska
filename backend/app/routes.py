@@ -1,10 +1,11 @@
 import datetime
 
+import bcrypt
 from flask_jwt_extended import create_access_token
 from app import app, db
-from flask import request, abort, jsonify, url_for, Response
+from flask import request, abort, jsonify, url_for, Response, make_response
 
-from app.models.user import Users, Keywords
+from app.models.user import Users, Keywords, BlacklistToken
 
 
 @app.shell_context_processor
@@ -14,19 +15,72 @@ def make_shell_context(self):
 
 @app.route('/login', methods=['POST'])
 def login(self):
-    body = request.get_json()
-    email = Users.objects.get(email=body.get('email'))
-    authorized = email.check_password(body.get('password'))
-    if not authorized:
-        return {'error': 'Email or password invalid'}, 401
-    expires = datetime.timedelta(days=7)
-    access_token = create_access_token(identity=str(email.id), expires_delta=expires)
-    return {'token': access_token}, 200
+    email = request.json.get('username')
+    password = request.json.get('password')
+    user = Users.query.filter_by(
+        email=email
+    ).first()
+    if user and bcrypt.check_password_hash(
+            user.password, password
+    ):
+        auth_token = user.encode_auth_token(user.id)
+        if auth_token:
+            responseObject = {
+                'status': 'success',
+                'message': 'Successfully logged in.',
+                'auth_token': auth_token.decode()
+            }
+            return make_response(jsonify(responseObject)), 200
+    else:
+        responseObject = {
+            'status': 'fail',
+            'message': 'User does not exist.'
+        }
+        return make_response(jsonify(responseObject)), 404
+
+
 
 
 @app.route('/logout', methods=['POST'])
 def logout(self):
-    return 'An user has been logged out successfully'
+    # get auth token
+    auth_header = request.headers.get('Authorization')
+    if auth_header:
+        auth_token = auth_header.split(" ")[1]
+    else:
+        auth_token = ''
+    if auth_token:
+        resp = Users.decode_auth_token(auth_token)
+        if not isinstance(resp, str):
+            # mark the token as blacklisted
+            blacklist_token = BlacklistToken(token=auth_token)
+            try:
+                # insert the token
+                db.session.add(blacklist_token)
+                db.session.commit()
+                responseObject = {
+                    'status': 'success',
+                    'message': 'Successfully logged out.'
+                }
+                return make_response(jsonify(responseObject)), 200
+            except Exception as e:
+                responseObject = {
+                    'status': 'fail',
+                    'message': e
+                }
+                return make_response(jsonify(responseObject)), 200
+        else:
+            responseObject = {
+                'status': 'fail',
+                'message': resp
+            }
+            return make_response(jsonify(responseObject)), 401
+    else:
+        responseObject = {
+            'status': 'fail',
+            'message': 'Provide a valid auth token.'
+        }
+        return make_response(jsonify(responseObject)), 403
 
 
 @app.route('/user', methods=['POST'])
@@ -44,12 +98,21 @@ def register():
         abort(Response('Taki uzytkownik juz istnieje.'))  # existing user
     user = Users(email=email)
     user.email = email
+    user.password = request.json.get('password')
     user.test_hash_password(password)
     user.created_at = datetime.datetime.now()
     user.last_login = datetime.datetime.now()
     db.session.add(user)
     db.session.commit()
-    return jsonify({'username': user.email}), 201, {'Location': 'Poznan'}
+    auth_token = user.encode_auth_token(user.id)
+    responseObject = {
+        'status': 'success',
+        'message': 'Successfully registered.',
+        'auth_token': auth_token.decode()
+    }
+
+    return jsonify({'username': user.email}), 201, {'Response': responseObject}
+
 
 
 @app.route('/keywords', methods=['POST'])
