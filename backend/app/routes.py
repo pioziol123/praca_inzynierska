@@ -1,12 +1,13 @@
 import datetime
 
-import bcrypt
-from flask_jwt_extended import create_access_token
+from flask_bcrypt import check_password_hash
 from app import app, db
-from flask import request, abort, jsonify, url_for, Response, make_response
+from flask import request, abort, jsonify, Response, make_response, Blueprint
 
 from app.models.user import Users, Keywords, BlacklistToken
 
+
+auth_blueprint = Blueprint('auth', __name__)
 
 @app.shell_context_processor
 def make_shell_context(self):
@@ -14,13 +15,13 @@ def make_shell_context(self):
 
 
 @app.route('/login', methods=['POST'])
-def login(self):
+def login():
     email = request.json.get('username')
     password = request.json.get('password')
     user = Users.query.filter_by(
         email=email
     ).first()
-    if user and bcrypt.check_password_hash(
+    if user and check_password_hash(
             user.password, password
     ):
         auth_token = user.encode_auth_token(user.id)
@@ -42,11 +43,11 @@ def login(self):
 
 
 @app.route('/logout', methods=['POST'])
-def logout(self):
+def logout():
     # get auth token
     auth_header = request.headers.get('Authorization')
     if auth_header:
-        auth_token = auth_header.split(" ")[1]
+        auth_token = auth_header
     else:
         auth_token = ''
     if auth_token:
@@ -96,10 +97,8 @@ def register():
         abort(Response('Haslo sie nie zgadza.'))
     if Users.query.filter_by(email=email).first() is not None:
         abort(Response('Taki uzytkownik juz istnieje.'))  # existing user
-    user = Users(email=email)
+    user = Users(email=email, password=password)
     user.email = email
-    user.password = request.json.get('password')
-    user.test_hash_password(password)
     user.created_at = datetime.datetime.now()
     user.last_login = datetime.datetime.now()
     db.session.add(user)
@@ -110,8 +109,7 @@ def register():
         'message': 'Successfully registered.',
         'auth_token': auth_token.decode()
     }
-
-    return jsonify({'username': user.email}), 201, {'Response': responseObject}
+    return make_response(jsonify(responseObject)), 201
 
 
 
@@ -120,8 +118,15 @@ def add_keyword():
     keyword = request.json.get('keyword')
     if keyword is None:
         abort(400)
-    db.session.add(keyword)
-
+    new_word = Keywords(keyword=keyword)
+    new_word.keyword = keyword
+    db.session.add(new_word)
+    db.session.commit()
+    responseObject = {
+        'status': 'success',
+        'message': 'Successfully added keyword.'
+    }
+    return jsonify({'Response': responseObject})
 
 @app.route('/keywords', methods=['GET'])
 def list_keywords(self):
