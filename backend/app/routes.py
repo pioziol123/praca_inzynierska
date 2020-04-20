@@ -120,6 +120,7 @@ def add_keyword():
         abort(400)
     new_word = Keywords(keyword=keyword)
     new_word.keyword = keyword
+    new_word.added_at = datetime.datetime.now()
     db.session.add(new_word)
     db.session.commit()
     responseObject = {
@@ -140,7 +141,17 @@ def remove_keyword(self):
     keyword = request.json.get('keyword')
     if keyword is None:
         abort(400)
+    keyword_obj = Keywords.query.filter_by(keyword=keyword).first()
+    if keyword_obj is None:
+        abort(Response('Nie ma takiego slowa w liscie.'))  # No such word
+    db.session.remove(keyword_obj)
+    db.session.commit()
+    responseObject = {
+        'status': 'success',
+        'message': 'Successfully removed keyword from list.'
+    }
+    return jsonify({'Response': responseObject})
 
 @app.route('/', methods=['GET'])
-def hello_world(self):
+def hello_world():
     return 'hello world'

@@ -8,6 +8,15 @@ import jwt
 class Keywords(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     keyword = db.Column(db.String(80), index=True, unique=False)
+    added_at = db.Column(db.String(200), index=True, unique=False)
+
+
+class BlockedUsers(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_name = db.Column(db.String(200), index=True, unique=True)
+    reason = db.Column(db.String(200), index=True, unique=False)
+    blocked_at = db.Column(db.DateTime, index=True, unique=False)
+
 
 
 class Users(db.Model):
