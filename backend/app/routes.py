@@ -1,7 +1,7 @@
 import datetime
 
 from flask_bcrypt import check_password_hash
-from app import app, db
+from app import application, db
 from flask import request, abort, jsonify, Response, make_response, Blueprint
 
 from app.models.user import Users, Keywords, BlacklistToken
@@ -9,12 +9,12 @@ from app.models.user import Users, Keywords, BlacklistToken
 
 auth_blueprint = Blueprint('auth', __name__)
 
-@app.shell_context_processor
+@application.shell_context_processor
 def make_shell_context(self):
     return {'User': Users, 'Keywords': Keywords}
 
 
-@app.route('/login', methods=['POST'])
+@application.route('/login', methods=['POST'])
 def login():
     email = request.json.get('username')
     password = request.json.get('password')
@@ -42,7 +42,7 @@ def login():
 
 
 
-@app.route('/logout', methods=['POST'])
+@application.route('/logout', methods=['POST'])
 def logout():
     # get auth token
     auth_header = request.headers.get('Authorization')
@@ -84,7 +84,7 @@ def logout():
         return make_response(jsonify(responseObject)), 403
 
 
-@app.route('/user', methods=['POST'])
+@application.route('/user', methods=['POST'])
 def register():
     email = request.json.get('username')
     password = request.json.get('password')
@@ -113,7 +113,7 @@ def register():
 
 
 
-@app.route('/keywords', methods=['POST'])
+@application.route('/keywords', methods=['POST'])
 def add_keyword():
     keyword = request.json.get('keyword')
     if keyword is None:
@@ -129,14 +129,14 @@ def add_keyword():
     }
     return jsonify({'Response': responseObject})
 
-@app.route('/keywords', methods=['GET'])
-def list_keywords(self):
+@application.route('/keywords', methods=['GET'])
+def list_keywords():
     uname = request.form['uname']
     mail = request.form['mail']
     passw = request.form['passw']
 
 
-@app.route('/keywords/{id}', methods=['DELETE'])
+@application.route('/keywords/{id}', methods=['DELETE'])
 def remove_keyword(self):
     keyword = request.json.get('keyword')
     if keyword is None:
@@ -152,6 +152,6 @@ def remove_keyword(self):
     }
     return jsonify({'Response': responseObject})
 
-@app.route('/', methods=['GET'])
+@application.route('/', methods=['GET'])
 def hello_world():
     return 'hello world'

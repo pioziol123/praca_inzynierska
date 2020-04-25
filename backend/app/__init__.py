@@ -6,14 +6,14 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 
-app = Flask(__name__)
+application = app = Flask(__name__)
 app.config.from_object('config')
 
-bcrypt = Bcrypt(app)
-db = SQLAlchemy(app)
+bcrypt = Bcrypt(application)
+db = SQLAlchemy(application)
 
-migrate = Migrate(app, db)
-login = LoginManager(app)
+migrate = Migrate(application, db)
+login = LoginManager(application)
 
 from app.models import user
 from app import routes

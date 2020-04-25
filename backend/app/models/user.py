@@ -2,7 +2,7 @@ import datetime
 
 from flask_bcrypt import generate_password_hash, check_password_hash
 from passlib.hash import pbkdf2_sha256 as sha256
-from app import db, app
+from app import db, application
 import jwt
 
 class Keywords(db.Model):
@@ -29,7 +29,7 @@ class Users(db.Model):
     def __init__(self, email, password, admin=False):
         self.email = email
         self.password = generate_password_hash(
-            password, app.config.get('BCRYPT_LOG_ROUNDS')
+            password, application.config.get('BCRYPT_LOG_ROUNDS')
         ).decode()
         self.registered_on = datetime.datetime.now()
         self.admin = admin
@@ -47,7 +47,7 @@ class Users(db.Model):
             }
             return jwt.encode(
                 payload,
-                app.config.get('SECRET_KEY'),
+                application.config.get('SECRET_KEY'),
                 algorithm='HS256'
             )
         except Exception as e:
@@ -61,7 +61,7 @@ class Users(db.Model):
         :return: integer|string
         """
         try:
-            payload = jwt.decode(auth_token, app.config.get('SECRET_KEY'))
+            payload = jwt.decode(auth_token, application.config.get('SECRET_KEY'))
             is_blacklisted_token = BlacklistToken.check_blacklist(auth_token)
             if is_blacklisted_token:
                 return 'Token blacklisted. Please log in again.'
