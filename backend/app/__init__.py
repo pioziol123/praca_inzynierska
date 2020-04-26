@@ -9,11 +9,11 @@ from flask_bcrypt import Bcrypt
 application = app = Flask(__name__)
 app.config.from_object('config')
 
-bcrypt = Bcrypt(application)
-db = SQLAlchemy(application)
+bcrypt = Bcrypt(app)
+db = SQLAlchemy(app)
 
-migrate = Migrate(application, db)
-login = LoginManager(application)
+migrate = Migrate(app, db)
+login = LoginManager(app)
 
 from app.models import user
 from app import routes
