@@ -1,5 +1,4 @@
-from app import application
+from app import app
 import config
-
 if __name__ == '__main__':
-    application.run(debug = config.APP_DEBUG)
+    app.run(debug = config.APP_DEBUG)
