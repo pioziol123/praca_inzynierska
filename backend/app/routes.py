@@ -1,7 +1,9 @@
 import datetime
 
 from flask_bcrypt import check_password_hash
+import jwt
 from app import application, db
+from flask_httpauth import HTTPBasicAuth
 from flask import request, abort, jsonify, Response, make_response, Blueprint
 
 from app.models.user import Users, Keywords, BlacklistToken
