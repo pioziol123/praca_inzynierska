@@ -1,4 +1,4 @@
-import getKeyWords from "./KeyWordsRepository";
+import {getKeyWords} from "../classes/Repository";
 import KeyWord from "./keyword.component";
 
 const template = `
