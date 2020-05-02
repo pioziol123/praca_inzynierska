@@ -1,5 +1,6 @@
 import WordList from "./wordlist.component";
 import RegisterForm from './registerform.component';
+import { getApi } from "../classes/Repository";
 
 const template = `
 <div>
@@ -8,11 +9,11 @@ const template = `
       <form id="filterLoginForm">
 				<div>
 				<label for="newregister-login">Login</label>
-					<input type="text" name="user[username]" id="newregister-login">
+					<input type="text" name="username" id="newregister-login">
         </div>
         <div>
           <label for="newregister-pass">Hasło</label>
-          <input type="password" name="user[password]" id="newregister-pass">
+          <input type="password" name="password" id="newregister-pass">
         </div>
         <fieldset class="row buttons">
           <p> 
@@ -34,11 +35,15 @@ class LoginForm extends HTMLDivElement {
   connectedCallback() {
     this.querySelector("#filterLoginForm").addEventListener("submit", e => {
       e.preventDefault();
-      document.cookie = `filter-account-cookie=filter-cookie-hash; expires=Thu, 01 Jan 2200 00:00:00 UTC;`;
-      this.parentElement.replaceChild(
-        document.createElement("div", { is: "word-list-component" }),
-        this
-      );
+      const username = e.target['username'].value;
+      const password = e.target['password'].value;
+      getApi().login(username, password).then(result => {
+        if (!result.success) return;
+        this.parentElement.replaceChild(
+          document.createElement("div", { is: "word-list-component" }),
+          this
+        );
+      });
     });
     this.querySelector("#filterRegister").addEventListener("click", e => {
         e.preventDefault();

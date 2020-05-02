@@ -13,5 +13,6 @@ class Connector {
 }
 
 Connector.register = 'user';
+Connector.login = 'login';
 Connector.url = "http://127.0.0.1/"
 export default Connector;

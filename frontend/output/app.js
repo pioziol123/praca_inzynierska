@@ -2012,10 +2012,22 @@ class Connector_Connector {
 }
 
 Connector_Connector.register = 'user';
+Connector_Connector.login = 'login';
 Connector_Connector.url = "http://127.0.0.1/"
 /* harmony default export */ var classes_Connector = (Connector_Connector);
 // CONCATENATED MODULE: ./src/classes/Api.js
 
+
+const cookieName = 'filter-account-cookie';
+
+function setCookie(cookie) {
+    const date = (new Date(Date.now() + 1000 * 60 * 60 * 24)).toUTCString();
+    document.cookie = `${cookieName}=${cookie}; expires=${date};`;
+}
+
+function getCookie(cookie) {
+
+}
 
 class Api_Api {
     constructor(connector) {
@@ -2025,6 +2037,14 @@ class Api_Api {
     async register(username, password, reapeatPassword) {
         const body = {username: username, password: password, repeat_password: reapeatPassword}
         return await this.connector.post(classes_Connector.register, body);
+    }
+
+    async login(username, password) {
+        const body = {username: username, password: password}
+        const result =  await this.connector.post(classes_Connector.login, body);
+        console.info(result);
+        setCookie(result.data.auth_token);
+        return result;    
     }
 }
 
@@ -2238,6 +2258,7 @@ customElements.define("registerform-component", registerform_component_RegisterF
 
 
 
+
 const loginform_component_template = `
 <div>
 	<ul class="newregister-drop">
@@ -2245,11 +2266,11 @@ const loginform_component_template = `
       <form id="filterLoginForm">
 				<div>
 				<label for="newregister-login">Login</label>
-					<input type="text" name="user[username]" id="newregister-login">
+					<input type="text" name="username" id="newregister-login">
         </div>
         <div>
           <label for="newregister-pass">Hasło</label>
-          <input type="password" name="user[password]" id="newregister-pass">
+          <input type="password" name="password" id="newregister-pass">
         </div>
         <fieldset class="row buttons">
           <p> 
@@ -2262,7 +2283,7 @@ const loginform_component_template = `
 	</ul>
 </div>
 `;
-class LoginForm extends HTMLDivElement {
+class loginform_component_LoginForm extends HTMLDivElement {
   constructor() {
     super();
     this.innerHTML = loginform_component_template;
@@ -2271,11 +2292,15 @@ class LoginForm extends HTMLDivElement {
   connectedCallback() {
     this.querySelector("#filterLoginForm").addEventListener("submit", e => {
       e.preventDefault();
-      document.cookie = `filter-account-cookie=filter-cookie-hash; expires=Thu, 01 Jan 2200 00:00:00 UTC;`;
-      this.parentElement.replaceChild(
-        document.createElement("div", { is: "word-list-component" }),
-        this
-      );
+      const username = e.target['username'].value;
+      const password = e.target['password'].value;
+      getApi().login(username, password).then(result => {
+        if (!result.success) return;
+        this.parentElement.replaceChild(
+          document.createElement("div", { is: "word-list-component" }),
+          this
+        );
+      });
     });
     this.querySelector("#filterRegister").addEventListener("click", e => {
         e.preventDefault();
@@ -2287,8 +2312,8 @@ class LoginForm extends HTMLDivElement {
   }
 }
 
-customElements.define("loginform-component", LoginForm, { extends: "div" });
-/* harmony default export */ var loginform_component = (LoginForm);
+customElements.define("loginform-component", loginform_component_LoginForm, { extends: "div" });
+/* harmony default export */ var loginform_component = (loginform_component_LoginForm);
 
 // CONCATENATED MODULE: ./src/components/login.component.js
 
