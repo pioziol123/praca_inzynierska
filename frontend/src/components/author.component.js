@@ -7,7 +7,7 @@ const template = `
     </a>
 `;
 
-class KeyWord extends HTMLDivElement {
+class Author extends HTMLDivElement {
   constructor() {
     super();
     this.classList.add("inlblk");
