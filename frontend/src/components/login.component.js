@@ -1,32 +1,21 @@
+import WordList from "./wordlist.component";
+import LoginForm from "./loginform.component";
 const template = `
 <div>
-	<ul class="newregister-drop">
-   <li>
-      <form id="filterLoginForm">
-				<div>
-				<label for="newregister-login">Login</label>
-					<input type="text" name="user[username]" id="newregister-login">
-        </div>
-        <div>
-          <label for="newregister-pass">Hasło</label>
-          <input type="password" name="user[password]" id="newregister-pass">
-        </div>
-        <fieldset class="row buttons">
-          <p>
-            <input type="submit" value="Zaloguj się">
-          </p>
-        </fieldset>
-      </form>
-		</li>
-	</ul>
+	<div is="loginform-component" />
 </div>
 `;
-
-class Login extends HTMLElement {
+class Login extends HTMLDivElement {
   constructor() {
     super();
+    this.id = "main-div";
+    this.setAttribute("class", "dropdown right");
+    this.style = "margin-left:-230px;";
     this.innerHTML = template;
   }
+
+  connectedCallback() {}
 }
 
+customElements.define("login-component", Login, { extends: "div" });
 export default Login;

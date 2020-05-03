@@ -1,9 +1,13 @@
-const path  = require("path")
+const path = require("path");
 
 module.exports = {
-  entry:  "./src/app.js",
+  mode: "production",
+  entry: "./src/app.js",
   output: {
-        path: path.resolve(__dirname, "output"),
-        filename: "app.js"
+    path: path.resolve(__dirname, "output"),
+    filename: "app.js"
   },
-}
+  optimization: {
+    minimize: false
+  },
+};
