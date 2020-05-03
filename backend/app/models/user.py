@@ -1,9 +1,9 @@
 import datetime
 
-from flask_bcrypt import generate_password_hash, check_password_hash
-from passlib.hash import pbkdf2_sha256 as sha256
+from flask_bcrypt import generate_password_hash
 from app import db, application
 import jwt
+
 
 class Keywords(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -11,16 +11,25 @@ class Keywords(db.Model):
     added_at = db.Column(db.String(200), index=True, unique=False)
 
 
-class BlockedUsers(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_name = db.Column(db.String(200), index=True, unique=True)
-    reason = db.Column(db.String(200), index=True, unique=False)
-    blocked_at = db.Column(db.DateTime, index=True, unique=False)
+class BlacklistToken(db.Model):
+    """
+    Token Model for storing JWT tokens
+    """
 
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    token = db.Column(db.String(500), unique=True, nullable=False)
+    blacklisted_on = db.Column(db.DateTime, nullable=False)
+
+    def __init__(self, token):
+        self.token = token
+        self.blacklisted_on = datetime.datetime.now()
+
+    def __repr__(self):
+        return '<id: token: {}'.format(self.token)
 
 
 class Users(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.String(200), index=True, unique=True)
     password = db.Column(db.String(200), index=True, unique=True)
     created_at = db.Column(db.DateTime, index=True, unique=False)
@@ -41,7 +50,7 @@ class Users(db.Model):
         """
         try:
             payload = {
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=5),
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, minutes=5),
                 'iat': datetime.datetime.utcnow(),
                 'sub': user_id
             }
@@ -55,11 +64,7 @@ class Users(db.Model):
 
     @staticmethod
     def decode_auth_token(auth_token):
-        """
-        Validates the auth token
-        :param auth_token:
-        :return: integer|string
-        """
+
         try:
             payload = jwt.decode(auth_token, application.config.get('SECRET_KEY'))
             is_blacklisted_token = BlacklistToken.check_blacklist(auth_token)
@@ -100,3 +105,9 @@ class BlacklistToken(db.Model):
             return False
 
 
+class BlockedUsers(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_name = db.Column(db.String(200), index=True, unique=True)
+    blocked_by = db.Column(db.Integer, index=True, unique=True)
+    blocked_at = db.Column(db.DateTime, index=True, unique=False)
+    last_login = db.Column(db.DateTime, index=True, unique=True)

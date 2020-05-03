@@ -6,8 +6,7 @@ from app import application, db
 from flask_httpauth import HTTPBasicAuth
 from flask import request, abort, jsonify, Response, make_response, Blueprint
 
-from app.models.user import Users, Keywords, BlacklistToken
-
+from app.models.user import Users, Keywords, BlacklistToken, BlockedUsers
 
 auth_blueprint = Blueprint('auth', __name__)
 
@@ -16,7 +15,7 @@ def make_shell_context(self):
     return {'User': Users, 'Keywords': Keywords}
 
 
-@application.route('/login', methods=['POST'])
+@application.route('/users/login', methods=['POST'])
 def login():
     email = request.json.get('username')
     password = request.json.get('password')
@@ -44,7 +43,7 @@ def login():
 
 
 
-@application.route('/logout', methods=['POST'])
+@application.route('/users/logout', methods=['POST'])
 def logout():
     # get auth token
     auth_header = request.headers.get('Authorization')
@@ -109,6 +108,7 @@ def register():
     responseObject = {
         'status': 'success',
         'message': 'Successfully registered.',
+        'user_id': user.id,
         'auth_token': auth_token.decode()
     }
     return make_response(jsonify(responseObject)), 201
@@ -127,15 +127,14 @@ def add_keyword():
     db.session.commit()
     responseObject = {
         'status': 'success',
-        'message': 'Successfully added keyword.'
+        'message': 'Successfully added keyword.',
+        'keyword_id': new_word.id
     }
     return jsonify({'Response': responseObject})
 
 @application.route('/keywords', methods=['GET'])
 def list_keywords():
-    uname = request.form['uname']
-    mail = request.form['mail']
-    passw = request.form['passw']
+    keywords_obj = Keywords.query.filter_by(Users.decode_auth_token())
 
 
 @application.route('/keywords/{id}', methods=['DELETE'])
@@ -151,6 +150,55 @@ def remove_keyword(self):
     responseObject = {
         'status': 'success',
         'message': 'Successfully removed keyword from list.'
+    }
+    return jsonify({'Response': responseObject})
+
+@application.route('/blocks', methods=['GET'])
+def list_blocked_users(self):
+    keyword = request.json.get('keyword')
+    if keyword is None:
+        abort(400)
+    blocked_users = BlockedUsers.query.filter_by(blocked_by=keyword)
+    responseObject = {
+        'status': 'success',
+        'message': 'Successfully removed keyword from list.',
+        'Users': blocked_users
+    }
+    return jsonify({'Response': responseObject})
+
+@application.route('/blocks', methods=['POST'])
+def block_user(self):
+    name = request.json.get('name')
+    if name is None:
+        abort(400)
+    keyword_obj = Keywords.query.filter_by(name=name).first()
+    if keyword_obj is None:
+        abort(Response('Nie ma takiego uzytkownika do zablokowania.'))  # No such word
+    new_word = BlockedUsers
+    new_word.user_name = name
+    new_word.added_at = datetime.datetime.now()
+    
+    db.session.add(new_word)
+    db.session.commit()
+    responseObject = {
+        'status': 'success',
+        'message': 'Successfully removed keyword from list.'
+    }
+    return jsonify({'Response': responseObject})
+
+@application.route('/blocks/{id}', methods=['DELETE'])
+def unblock_user(self):
+    id = request.args.get(0)
+    if id is None:
+        abort(400)
+    blocked_user = BlockedUsers.query.filter_by(id=id).first()
+    if blocked_user is None:
+        abort(Response('Nie ma takiego uzytkownika na liscie zablokowanych uzytkownikow.'))
+    db.session.remove(blocked_user)
+    db.session.commit()
+    responseObject = {
+        'status': 'success',
+        'message': 'Successfully unblocked user.'
     }
     return jsonify({'Response': responseObject})
 
