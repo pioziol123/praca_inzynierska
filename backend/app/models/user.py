@@ -7,8 +7,9 @@ import jwt
 
 class Keywords(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    keyword = db.Column(db.String(80), index=True, unique=False)
+    keyword = db.Column(db.String(80), index=True, unique=True)
     added_at = db.Column(db.String(200), index=True, unique=False)
+    added_by = db.Column(db.Integer, index=True, unique=False)
 
 
 class BlacklistToken(db.Model):
@@ -110,4 +111,8 @@ class BlockedUsers(db.Model):
     user_name = db.Column(db.String(200), index=True, unique=True)
     blocked_by = db.Column(db.Integer, index=True, unique=True)
     blocked_at = db.Column(db.DateTime, index=True, unique=False)
-    last_login = db.Column(db.DateTime, index=True, unique=True)
+
+    def __init__(self, user_name, blocked_by):
+        self.user_name = user_name
+        self.blocked_by = blocked_by
+        self.blocked_at = datetime.datetime.now()

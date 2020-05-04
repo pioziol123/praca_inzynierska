@@ -1,30 +1,33 @@
 import datetime
 
+import flask
 from flask_bcrypt import check_password_hash
 import jwt
 from app import application, db
 from flask_httpauth import HTTPBasicAuth
-from flask import request, abort, jsonify, Response, make_response, Blueprint
+from flask import request, abort, jsonify, Response, make_response, Blueprint, session
 
 from app.models.user import Users, Keywords, BlacklistToken, BlockedUsers
 
 auth_blueprint = Blueprint('auth', __name__)
+
 
 @application.shell_context_processor
 def make_shell_context(self):
     return {'User': Users, 'Keywords': Keywords}
 
 
+
+
+
 @application.route('/users/login', methods=['POST'])
 def login():
     email = request.json.get('username')
     password = request.json.get('password')
-    user = Users.query.filter_by(
-        email=email
-    ).first()
-    if user and check_password_hash(
-            user.password, password
-    ):
+    user = Users.query.filter_by(email=email).first()
+    if user and check_password_hash(user.password, password):
+        session['email'] = email
+        session['user_id'] = user.id
         auth_token = user.encode_auth_token(user.id)
         if auth_token:
             responseObject = {
@@ -32,6 +35,9 @@ def login():
                 'message': 'Successfully logged in.',
                 'auth_token': auth_token.decode()
             }
+            res = flask.make_response(jsonify(responseObject))
+            res.set_cookie('cookie', auth_token)
+            res.set_cookie('email', email)
             return make_response(jsonify(responseObject)), 200
     else:
         responseObject = {
@@ -39,8 +45,6 @@ def login():
             'message': 'User does not exist.'
         }
         return make_response(jsonify(responseObject)), 404
-
-
 
 
 @application.route('/users/logout', methods=['POST'])
@@ -91,7 +95,7 @@ def register():
     password = request.json.get('password')
     repeat_password = request.json.get('repeat_password')
     if email is None:
-        abort(Response('Brak adresu email')) # missing arguments
+        abort(Response('Brak adresu email'))  # missing arguments
     if password is None or repeat_password is None:
         abort(Response('Nie podano hasla prawidlowo.'))
     if password != repeat_password:
@@ -105,6 +109,7 @@ def register():
     db.session.add(user)
     db.session.commit()
     auth_token = user.encode_auth_token(user.id)
+    Response.set_cookie(auth_token)
     responseObject = {
         'status': 'success',
         'message': 'Successfully registered.',
@@ -112,7 +117,6 @@ def register():
         'auth_token': auth_token.decode()
     }
     return make_response(jsonify(responseObject)), 201
-
 
 
 @application.route('/keywords', methods=['POST'])
@@ -123,6 +127,7 @@ def add_keyword():
     new_word = Keywords(keyword=keyword)
     new_word.keyword = keyword
     new_word.added_at = datetime.datetime.now()
+    new_word.added_by = 1
     db.session.add(new_word)
     db.session.commit()
     responseObject = {
@@ -132,13 +137,14 @@ def add_keyword():
     }
     return jsonify({'Response': responseObject})
 
+
 @application.route('/keywords', methods=['GET'])
 def list_keywords():
     keywords_obj = Keywords.query.filter_by(Users.decode_auth_token())
 
 
 @application.route('/keywords/{id}', methods=['DELETE'])
-def remove_keyword(self):
+def remove_keyword():
     keyword = request.json.get('keyword')
     if keyword is None:
         abort(400)
@@ -153,8 +159,9 @@ def remove_keyword(self):
     }
     return jsonify({'Response': responseObject})
 
+
 @application.route('/blocks', methods=['GET'])
-def list_blocked_users(self):
+def list_blocked_users():
     keyword = request.json.get('keyword')
     if keyword is None:
         abort(400)
@@ -166,8 +173,9 @@ def list_blocked_users(self):
     }
     return jsonify({'Response': responseObject})
 
+
 @application.route('/blocks', methods=['POST'])
-def block_user(self):
+def block_user():
     name = request.json.get('name')
     if name is None:
         abort(400)
@@ -177,7 +185,7 @@ def block_user(self):
     new_word = BlockedUsers
     new_word.user_name = name
     new_word.added_at = datetime.datetime.now()
-    
+    new_word.added_by = request.cookies.get('user.id')
     db.session.add(new_word)
     db.session.commit()
     responseObject = {
@@ -186,8 +194,9 @@ def block_user(self):
     }
     return jsonify({'Response': responseObject})
 
+
 @application.route('/blocks/{id}', methods=['DELETE'])
-def unblock_user(self):
+def unblock_user():
     id = request.args.get(0)
     if id is None:
         abort(400)
@@ -201,6 +210,7 @@ def unblock_user(self):
         'message': 'Successfully unblocked user.'
     }
     return jsonify({'Response': responseObject})
+
 
 @application.route('/', methods=['GET'])
 def hello_world():
