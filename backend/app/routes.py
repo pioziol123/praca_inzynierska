@@ -36,9 +36,8 @@ def login():
                 'auth_token': auth_token.decode()
             }
             res = flask.make_response(jsonify(responseObject))
-            res.set_cookie('cookie', auth_token)
-            res.set_cookie('email', email)
-            return make_response(jsonify(responseObject)), 200
+            res.set_cookie('userId', str(user.id))
+            return res
     else:
         responseObject = {
             'status': 'fail',
@@ -50,6 +49,7 @@ def login():
 @application.route('/users/logout', methods=['POST'])
 def logout():
     # get auth token
+
     auth_header = request.headers.get('Authorization')
     if auth_header:
         auth_token = auth_header
