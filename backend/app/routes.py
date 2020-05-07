@@ -109,7 +109,6 @@ def register():
     db.session.add(user)
     db.session.commit()
     auth_token = user.encode_auth_token(user.id)
-    Response.set_cookie(auth_token)
     responseObject = {
         'status': 'success',
         'message': 'Successfully registered.',
