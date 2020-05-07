@@ -36,7 +36,7 @@ def login():
                 'auth_token': auth_token.decode()
             }
             res = flask.make_response(jsonify(responseObject))
-            res.set_cookie('userId', str(user.id))
+            res.set_cookie('userId', value=str(user.id), httponly=True)
             return res
     else:
         responseObject = {
