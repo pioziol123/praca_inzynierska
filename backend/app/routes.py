@@ -36,7 +36,6 @@ def login():
 
 @application.route('/users/logout', methods=['POST'])
 def logout():
-
     if request.cookies.get('userId') is not '':
         result = flask.make_response(jsonify('Successfully logged out'))
         result.set_cookie('userId', '')
@@ -74,43 +73,54 @@ def register():
 
 @application.route('/keywords', methods=['POST'])
 def add_keyword():
-    keyword = request.json.get('keyword')
-    if keyword is None:
-        abort(400)
-    new_word = Keywords(keyword=keyword)
-    new_word.keyword = keyword
-    new_word.added_at = datetime.datetime.now()
-    new_word.added_by = 1
-    db.session.add(new_word)
-    db.session.commit()
-    responseObject = {
-        'status': 'success',
-        'message': 'Successfully added keyword.',
-        'keyword_id': new_word.id
-    }
-    return jsonify({'Response': responseObject})
+    if request.cookies.get('userId') is not '':
+        keyword = request.json.get('keyword')
+        if keyword is None:
+            abort(400)
+        new_word = Keywords(keyword=keyword)
+        new_word.keyword = keyword
+        new_word.added_at = datetime.datetime.now()
+        new_word.added_by = 1
+        db.session.add(new_word)
+        db.session.commit()
+        responseObject = {
+            'status': 'success',
+            'message': 'Successfully added keyword.',
+            'keyword_id': new_word.id
+        }
+        return jsonify({'Response': responseObject})
+    else:
+        return jsonify({'Response': 405})
 
 
 @application.route('/keywords', methods=['GET'])
 def list_keywords():
-    keywords_obj = Keywords.query.filter_by(Users.decode_auth_token())
+    userId = request.cookies.get('userId')
+    if request.cookies.get('userId') is not '':
+        keywords_obj = Keywords.query.filter_by(added_by=str(userId)).all()
+        return make_response(jsonify(keywords_obj))
+    else:
+        return jsonify({'Response': 405})
 
 
 @application.route('/keywords/{id}', methods=['DELETE'])
 def remove_keyword():
-    keyword = request.json.get('keyword')
-    if keyword is None:
-        abort(400)
-    keyword_obj = Keywords.query.filter_by(keyword=keyword).first()
-    if keyword_obj is None:
-        abort(Response('Nie ma takiego slowa w liscie.'))  # No such word
-    db.session.remove(keyword_obj)
-    db.session.commit()
-    responseObject = {
-        'status': 'success',
-        'message': 'Successfully removed keyword from list.'
-    }
-    return jsonify({'Response': responseObject})
+    if request.cookies.get('userId') is not '':
+        keyword = request.json.get('keyword')
+        if keyword is None:
+            abort(400)
+        keyword_obj = Keywords.query.filter_by(keyword=keyword).first()
+        if keyword_obj is None:
+            abort(Response('Nie ma takiego slowa w liscie.'))  # No such word
+        db.session.remove(keyword_obj)
+        db.session.commit()
+        responseObject = {
+            'status': 'success',
+            'message': 'Successfully removed keyword from list.'
+        }
+        return jsonify({'Response': responseObject})
+    else:
+        return jsonify({'Response': 405})
 
 
 @application.route('/blocks', methods=['GET'])
@@ -129,23 +139,27 @@ def list_blocked_users():
 
 @application.route('/blocks', methods=['POST'])
 def block_user():
-    name = request.json.get('name')
-    if name is None:
-        abort(400)
-    keyword_obj = Keywords.query.filter_by(name=name).first()
-    if keyword_obj is None:
-        abort(Response('Nie ma takiego uzytkownika do zablokowania.'))  # No such word
-    new_word = BlockedUsers
-    new_word.user_name = name
-    new_word.added_at = datetime.datetime.now()
-    new_word.added_by = request.cookies.get('user.id')
-    db.session.add(new_word)
-    db.session.commit()
-    responseObject = {
-        'status': 'success',
-        'message': 'Successfully removed keyword from list.'
-    }
-    return jsonify({'Response': responseObject})
+    userId = request.cookies.get('userId')
+    if userId is not '':
+        name = request.json.get('name')
+        if name is None:
+            abort(400)
+        keyword_obj = Keywords.query.filter_by(name=name).first()
+        if keyword_obj is None:
+            abort(Response('Nie ma takiego uzytkownika do zablokowania.'))  # No such word
+        new_word = BlockedUsers
+        new_word.user_name = name
+        new_word.added_at = datetime.datetime.now()
+        new_word.added_by = userId
+        db.session.add(new_word)
+        db.session.commit()
+        responseObject = {
+            'status': 'success',
+            'message': 'Successfully removed keyword from list.'
+        }
+        return jsonify({'Response': responseObject})
+    else:
+        return jsonify({'Response': 405})
 
 
 @application.route('/blocks/{id}', methods=['DELETE'])
