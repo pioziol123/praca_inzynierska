@@ -74,7 +74,6 @@ def register():
 
 @application.route('/keywords', methods=['POST'])
 def add_keyword():
-    if
     keyword = request.json.get('keyword')
     if keyword is None:
         abort(400)
