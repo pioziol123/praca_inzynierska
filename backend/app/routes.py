@@ -17,27 +17,15 @@ def make_shell_context(self):
     return {'User': Users, 'Keywords': Keywords}
 
 
-
-
-
 @application.route('/users/login', methods=['POST'])
 def login():
     email = request.json.get('username')
     password = request.json.get('password')
     user = Users.query.filter_by(email=email).first()
     if user and check_password_hash(user.password, password):
-        session['email'] = email
-        session['user_id'] = user.id
-        auth_token = user.encode_auth_token(user.id)
-        if auth_token:
-            responseObject = {
-                'status': 'success',
-                'message': 'Successfully logged in.',
-                'auth_token': auth_token.decode()
-            }
-            res = flask.make_response(jsonify(responseObject))
-            res.set_cookie('userId', value=str(user.id), httponly=True)
-            return res
+        res = flask.make_response(jsonify(user.id))
+        res.set_cookie('userId', value=str(user.id), httponly=True)
+        return res
     else:
         responseObject = {
             'status': 'fail',
@@ -50,43 +38,13 @@ def login():
 def logout():
     # get auth token
 
-    auth_header = request.headers.get('Authorization')
-    if auth_header:
-        auth_token = auth_header
+    tmp = request.cookies
+    if request.cookies.get('userId') is not '':
+        result = flask.make_response(jsonify('Successfully logged out'))
+        result.set_cookie('userId', '')
+        return result
     else:
-        auth_token = ''
-    if auth_token:
-        resp = Users.decode_auth_token(auth_token)
-        if not isinstance(resp, str):
-            # mark the token as blacklisted
-            blacklist_token = BlacklistToken(token=auth_token)
-            try:
-                # insert the token
-                db.session.add(blacklist_token)
-                db.session.commit()
-                responseObject = {
-                    'status': 'success',
-                    'message': 'Successfully logged out.'
-                }
-                return make_response(jsonify(responseObject)), 200
-            except Exception as e:
-                responseObject = {
-                    'status': 'fail',
-                    'message': e
-                }
-                return make_response(jsonify(responseObject)), 200
-        else:
-            responseObject = {
-                'status': 'fail',
-                'message': resp
-            }
-            return make_response(jsonify(responseObject)), 401
-    else:
-        responseObject = {
-            'status': 'fail',
-            'message': 'Provide a valid auth token.'
-        }
-        return make_response(jsonify(responseObject)), 403
+        return make_response(jsonify('Invalid operation')), 401
 
 
 @application.route('/user', methods=['POST'])
@@ -108,12 +66,10 @@ def register():
     user.last_login = datetime.datetime.now()
     db.session.add(user)
     db.session.commit()
-    auth_token = user.encode_auth_token(user.id)
     responseObject = {
         'status': 'success',
         'message': 'Successfully registered.',
         'user_id': user.id,
-        'auth_token': auth_token.decode()
     }
     return make_response(jsonify(responseObject)), 201
 
