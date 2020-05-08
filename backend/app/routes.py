@@ -36,9 +36,7 @@ def login():
 
 @application.route('/users/logout', methods=['POST'])
 def logout():
-    # get auth token
 
-    tmp = request.cookies
     if request.cookies.get('userId') is not '':
         result = flask.make_response(jsonify('Successfully logged out'))
         result.set_cookie('userId', '')
@@ -76,6 +74,7 @@ def register():
 
 @application.route('/keywords', methods=['POST'])
 def add_keyword():
+    if
     keyword = request.json.get('keyword')
     if keyword is None:
         abort(400)
