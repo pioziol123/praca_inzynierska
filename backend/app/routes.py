@@ -125,17 +125,19 @@ def remove_keyword():
 
 @application.route('/blocks', methods=['GET'])
 def list_blocked_users():
-    keyword = request.json.get('keyword')
-    if keyword is None:
-        abort(400)
-    blocked_users = BlockedUsers.query.filter_by(blocked_by=keyword)
-    responseObject = {
-        'status': 'success',
-        'message': 'Successfully removed keyword from list.',
-        'Users': blocked_users
-    }
-    return jsonify({'Response': responseObject})
-
+    if request.cookies.get('userId') is not '':
+        keyword = request.json.get('keyword')
+        if keyword is None:
+            abort(400)
+        blocked_users = BlockedUsers.query.filter_by(blocked_by=keyword)
+        responseObject = {
+            'status': 'success',
+            'message': 'Successfully removed keyword from list.',
+            'Users': blocked_users
+        }
+        return jsonify({'Response': responseObject})
+    else:
+        return jsonify({'Response': 405})
 
 @application.route('/blocks', methods=['POST'])
 def block_user():
@@ -164,20 +166,22 @@ def block_user():
 
 @application.route('/blocks/{id}', methods=['DELETE'])
 def unblock_user():
-    id = request.args.get(0)
-    if id is None:
-        abort(400)
-    blocked_user = BlockedUsers.query.filter_by(id=id).first()
-    if blocked_user is None:
-        abort(Response('Nie ma takiego uzytkownika na liscie zablokowanych uzytkownikow.'))
-    db.session.remove(blocked_user)
-    db.session.commit()
-    responseObject = {
-        'status': 'success',
-        'message': 'Successfully unblocked user.'
-    }
-    return jsonify({'Response': responseObject})
-
+    if request.cookies.get('userId') is not '':
+        id = request.args.get(0)
+        if id is None:
+            abort(400)
+        blocked_user = BlockedUsers.query.filter_by(id=id).first()
+        if blocked_user is None:
+            abort(Response('Nie ma takiego uzytkownika na liscie zablokowanych uzytkownikow.'))
+        db.session.remove(blocked_user)
+        db.session.commit()
+        responseObject = {
+            'status': 'success',
+            'message': 'Successfully unblocked user.'
+        }
+        return jsonify({'Response': responseObject})
+    else:
+        return jsonify({'Response': 405})
 
 @application.route('/', methods=['GET'])
 def hello_world():
