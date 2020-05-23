@@ -1,13 +1,12 @@
 import datetime
 
 import flask
+import json
 from flask_bcrypt import check_password_hash
-import jwt
 from app import application, db
-from flask_httpauth import HTTPBasicAuth
-from flask import request, abort, jsonify, Response, make_response, Blueprint, session
+from flask import request, abort, jsonify, Response, make_response, Blueprint
 
-from app.models.user import Users, Keywords, BlacklistToken, BlockedUsers
+from app.models.user import Users, Keywords, BlockedUsers
 
 auth_blueprint = Blueprint('auth', __name__)
 
@@ -80,7 +79,7 @@ def add_keyword():
         new_word = Keywords(keyword=keyword)
         new_word.keyword = keyword
         new_word.added_at = datetime.datetime.now()
-        new_word.added_by = 1
+        new_word.added_by = request.cookies.get('userId')
         db.session.add(new_word)
         db.session.commit()
         responseObject = {
@@ -96,9 +95,10 @@ def add_keyword():
 @application.route('/keywords', methods=['GET'])
 def list_keywords():
     userId = request.cookies.get('userId')
-    if request.cookies.get('userId') is not '':
+    if userId is not '':
         keywords_obj = Keywords.query.filter_by(added_by=str(userId)).all()
-        return make_response(jsonify(keywords_obj))
+        keywords_list = [e.serialize() for e in keywords_obj]
+        return jsonify(keywords_list)
     else:
         return jsonify({'Response': 405})
 
