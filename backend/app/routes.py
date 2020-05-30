@@ -5,6 +5,7 @@ import json
 from flask_bcrypt import check_password_hash
 from app import application, db
 from flask import request, abort, jsonify, Response, make_response, Blueprint
+from app import word_analyzer
 
 from app.models.user import Users, Keywords, BlockedUsers
 
@@ -72,12 +73,13 @@ def register():
 
 @application.route('/keywords', methods=['POST'])
 def add_keyword():
-    if request.cookies.get('userId') is not '':
+    userId = request.cookies.get('userId')
+    if userId is not '':
         keyword = request.json.get('keyword')
         if keyword is None:
             abort(400)
         new_word = Keywords(keyword=keyword)
-        new_word.keyword = keyword
+        new_word.word = keyword
         new_word.added_at = datetime.datetime.now()
         new_word.added_by = request.cookies.get('userId')
         db.session.add(new_word)
@@ -98,6 +100,9 @@ def list_keywords():
     if userId is not '':
         keywords_obj = Keywords.query.filter_by(added_by=str(userId)).all()
         keywords_list = [e.serialize() for e in keywords_obj]
+
+        for keyword in keywords_list:
+            keyword = keyword.word
         return jsonify(keywords_list)
     else:
         return jsonify({'Response': 405})
@@ -129,15 +134,17 @@ def list_blocked_users():
         keyword = request.json.get('keyword')
         if keyword is None:
             abort(400)
-        blocked_users = BlockedUsers.query.filter_by(blocked_by=keyword)
+        blocked_users = BlockedUsers.query.filter_by(blocked_by=keyword).all()
+        blocked_users_list = [e.serialize() for e in blocked_users]
         responseObject = {
             'status': 'success',
             'message': 'Successfully removed keyword from list.',
-            'Users': blocked_users
+            'Users': blocked_users_list
         }
         return jsonify({'Response': responseObject})
     else:
         return jsonify({'Response': 405})
+
 
 @application.route('/blocks', methods=['POST'])
 def block_user():
@@ -181,7 +188,21 @@ def unblock_user():
         }
         return jsonify({'Response': responseObject})
     else:
-        return jsonify({'Response': 405})
+        return jsonify({'Response': abort(405)})
+
+
+@application.route('/detection', methods=['GET'])
+def suggest_word():
+    user_id = request.cookies.get('userId')
+    # words = request.cookies.get('word')
+    same_word_count = 4
+    if user_id is not '':
+        keywords_obj = Keywords.query.filter_by(added_by=user_id)
+        keywords_list = [e.serialize() for e in keywords_obj]
+        words_count = keywords_list.len()
+        word_analyzer.write_data(keywords_list.to_json(), words_count)
+        return 'dupa'
+
 
 @application.route('/', methods=['GET'])
 def hello_world():

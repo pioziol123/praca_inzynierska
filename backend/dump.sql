@@ -9,7 +9,7 @@ CREATE TABLE mysql.blocked_users (
 
 CREATE TABLE mysql.keywords (
 	id                   int UNSIGNED NOT NULL  AUTO_INCREMENT  PRIMARY KEY,
-	keyword              varchar(80)      ,
+	word                 varchar(80)      ,
 	added_at             datetime  NOT NULL DEFAULT CURRENT_TIMESTAMP   ,
 	added_by             varchar(200)  NOT NULL
  );
@@ -22,8 +22,8 @@ CREATE TABLE mysql.users (
 	last_login           datetime  NOT NULL DEFAULT CURRENT_TIMESTAMP
  );
 
-INSERT INTO mysql.keywords( id, keyword, added_at, added_by ) VALUES ( 1, 'dupda', '2020-04-20 18:39:44', '' );
-INSERT INTO mysql.keywords( id, keyword, added_at, added_by ) VALUES ( 2, 'szmata', '2020-05-03 18:11:08', '1' );
+INSERT INTO mysql.keywords( id, word, added_at, added_by ) VALUES ( 1, 'dupda', '2020-04-20 18:39:44', '' );
+INSERT INTO mysql.keywords( id, word, added_at, added_by ) VALUES ( 2, 'szmata', '2020-05-03 18:11:08', '1' );
 INSERT INTO mysql.users( id, email, password, created_at, last_login ) VALUES ( 1, 'wojkal123@gowno.pl', null, '2020-04-11 21:42:52', '2020-04-11 21:42:52' );
 INSERT INTO mysql.users( id, email, password, created_at, last_login ) VALUES ( 6, 'testuser@test.pl', null, '2020-04-13 14:00:32', '2020-04-13 14:00:32' );
 INSERT INTO mysql.users( id, email, password, created_at, last_login ) VALUES ( 7, 'testuser@tes2t.pl', null, '2020-04-14 22:57:36', '2020-04-14 22:57:36' );
