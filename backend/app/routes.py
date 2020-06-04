@@ -73,8 +73,8 @@ def register():
 
 @application.route('/keywords', methods=['POST'])
 def add_keyword():
-    userId = request.cookies.get('userId')
-    if userId is not '':
+    user_id = request.cookies.get('userId')
+    if user_id is not '':
         keyword = request.json.get('keyword')
         if keyword is None:
             abort(400)
@@ -96,9 +96,9 @@ def add_keyword():
 
 @application.route('/keywords', methods=['GET'])
 def list_keywords():
-    userId = request.cookies.get('userId')
-    if userId is not '':
-        keywords_obj = Keywords.query.filter_by(added_by=str(userId)).all()
+    user_id = request.cookies.get('userId')
+    if user_id is not '':
+        keywords_obj = Keywords.query.filter_by(added_by=str(user_id)).all()
         keywords_list = [e.serialize() for e in keywords_obj]
 
         for keyword in keywords_list:
@@ -119,37 +119,35 @@ def remove_keyword():
             abort(Response('Nie ma takiego slowa w liscie.'))  # No such word
         db.session.remove(keyword_obj)
         db.session.commit()
-        responseObject = {
+        response_object = {
             'status': 'success',
             'message': 'Successfully removed keyword from list.'
         }
-        return jsonify({'Response': responseObject})
+        return jsonify({'Response': response_object})
     else:
         return jsonify({'Response': 405})
 
 
 @application.route('/blocks', methods=['GET'])
 def list_blocked_users():
-    if request.cookies.get('userId') is not '':
-        keyword = request.json.get('keyword')
-        if keyword is None:
-            abort(400)
-        blocked_users = BlockedUsers.query.filter_by(blocked_by=keyword).all()
+    user_id = request.cookies.get('userId')
+    if user_id is not '':
+        blocked_users = BlockedUsers.query.filter_by(blocked_by=user_id).all()
         blocked_users_list = [e.serialize() for e in blocked_users]
-        responseObject = {
+        response_object = {
             'status': 'success',
             'message': 'Successfully removed keyword from list.',
             'Users': blocked_users_list
         }
-        return jsonify({'Response': responseObject})
+        return jsonify({'Response': response_object})
     else:
         return jsonify({'Response': 405})
 
 
 @application.route('/blocks', methods=['POST'])
 def block_user():
-    userId = request.cookies.get('userId')
-    if userId is not '':
+    user_id = request.cookies.get('userId')
+    if user_id is not '':
         name = request.json.get('name')
         if name is None:
             abort(400)
@@ -159,25 +157,26 @@ def block_user():
         new_word = BlockedUsers
         new_word.user_name = name
         new_word.added_at = datetime.datetime.now()
-        new_word.added_by = userId
+        new_word.added_by = user_id
         db.session.add(new_word)
         db.session.commit()
-        responseObject = {
+        response_object = {
             'status': 'success',
             'message': 'Successfully removed keyword from list.'
         }
-        return jsonify({'Response': responseObject})
+        return jsonify({'Response': response_object})
     else:
         return jsonify({'Response': 405})
 
 
 @application.route('/blocks/{id}', methods=['DELETE'])
 def unblock_user():
-    if request.cookies.get('userId') is not '':
-        id = request.args.get(0)
+    user_id = request.cookies.get('userId')
+    if user_id is not '':
+        blocked_user = request.json.get('blocked_user')
         if id is None:
             abort(400)
-        blocked_user = BlockedUsers.query.filter_by(id=id).first()
+        blocked_user = BlockedUsers.query.filter_by(blocked_by=blocked_user).first()
         if blocked_user is None:
             abort(Response('Nie ma takiego uzytkownika na liscie zablokowanych uzytkownikow.'))
         db.session.remove(blocked_user)

@@ -7,14 +7,14 @@ import jwt
 
 class Keywords(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    keyword = db.Column(db.String(80), index=True, unique=True)
+    word = db.Column(db.String(80), index=True, unique=True)
     added_at = db.Column(db.String(200), index=True, unique=False)
     added_by = db.Column(db.Integer, index=True, unique=False)
 
     def serialize(self):
         return {
             'id': self.id,
-            'keyword': self.keyword,
+            'word': self.word,
             'added_at': self.added_at,
             'added_by': self.added_by
         }
@@ -55,9 +55,6 @@ class Users(db.Model):
             return e
 
 
-
-
-
 class BlockedUsers(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_name = db.Column(db.String(200), index=True, unique=True)
@@ -68,3 +65,13 @@ class BlockedUsers(db.Model):
         self.user_name = user_name
         self.blocked_by = blocked_by
         self.blocked_at = datetime.datetime.now()
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'user_name': self.user_name,
+            'blocked_by': self.blocked_by,
+            'blocked_at': self.blocked_at
+        }
+
+
