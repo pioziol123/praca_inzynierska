@@ -1,3 +1,4 @@
+import collections
 import datetime
 
 import flask
@@ -6,6 +7,7 @@ from flask_bcrypt import check_password_hash
 from app import application, db
 from flask import request, abort, jsonify, Response, make_response, Blueprint
 from app import word_analyzer
+from itertools import groupby
 
 from app.models.user import Users, Keywords, BlockedUsers
 
@@ -82,7 +84,7 @@ def add_keyword():
         new_word.word = keyword
         new_word.added_at = datetime.datetime.now()
         new_word.added_by = request.cookies.get('userId')
-        new_word.word_topic = request.cookies.get('word_topic')
+        new_word.word_topic = request.json.get('word_topic')
         db.session.add(new_word)
         db.session.commit()
         responseObject = {
@@ -195,8 +197,10 @@ def suggest_word():
         words = []
         for keyword in keywords_list:
             words.append(keyword['word'])
-
         words_count = len(keywords_list)
+        result = collections.defaultdict(list)
+        for i in keywords_list:
+            result[i['word_topic']].append(i['word'])
         word_analyzer.write_data(keywords_list, words_count, words)
         return 'dupa'
 
