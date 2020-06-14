@@ -1,7 +1,7 @@
 import datetime
 
 import flask
-import json
+
 from flask_bcrypt import check_password_hash
 from app import application, db
 from flask import request, abort, jsonify, Response, make_response, Blueprint
@@ -41,7 +41,7 @@ def logout():
         result.set_cookie('userId', '')
         return result
     else:
-        return make_response(jsonify('Invalid operation')), 401
+        return Response("Brak dostepu", status=405, mimetype='application/json')
 
 
 @application.route('/user', methods=['POST'])
@@ -82,6 +82,7 @@ def add_keyword():
         new_word.word = keyword
         new_word.added_at = datetime.datetime.now()
         new_word.added_by = request.cookies.get('userId')
+        new_word.word_topic = request.cookies.get('word_topic')
         db.session.add(new_word)
         db.session.commit()
         responseObject = {
@@ -91,7 +92,7 @@ def add_keyword():
         }
         return jsonify({'Response': responseObject})
     else:
-        return jsonify({'Response': 405})
+        return Response("Brak dostepu", status=405, mimetype='application/json')
 
 
 @application.route('/keywords', methods=['GET'])
@@ -102,7 +103,7 @@ def list_keywords():
         keywords_list = [e.serialize() for e in keywords_obj]
         return jsonify(keywords_list)
     else:
-        return jsonify({'Response': 405})
+        return Response("Brak dostepu", status=405, mimetype='application/json')
 
 
 @application.route('/keywords', methods=['DELETE'])
@@ -122,7 +123,7 @@ def remove_keyword():
         }
         return jsonify({'Response': response_object})
     else:
-        return jsonify({'Response': 405})
+        return Response("Brak dostepu", status=405, mimetype='application/json')
 
 
 @application.route('/blocks', methods=['GET'])
@@ -133,7 +134,7 @@ def list_blocked_users():
         blocked_users_list = [e.serialize() for e in blocked_users]
         return jsonify({'Response': blocked_users_list})
     else:
-        return jsonify({'Response': 405})
+        return Response("Brak dostepu", status=405, mimetype='application/json')
 
 
 @application.route('/blocks', methods=['POST'])
@@ -159,7 +160,7 @@ def block_user():
         }
         return jsonify({'Response': response_object})
     else:
-        return jsonify({'Response': 405})
+        return Response("Brak dostepu", status=405, mimetype='application/json')
 
 
 @application.route('/blocks', methods=['DELETE'])
@@ -180,7 +181,7 @@ def unblock_user():
         }
         return jsonify({'Response': responseObject})
     else:
-        return jsonify({'Response': abort(405)})
+        return Response("Brak dostepu", status=405, mimetype='application/json')
 
 
 @application.route('/detection', methods=['GET'])
@@ -191,8 +192,12 @@ def suggest_word():
     if user_id is not '':
         keywords_obj = Keywords.query.filter_by(added_by=user_id)
         keywords_list = [e.serialize() for e in keywords_obj]
+        words = []
+        for keyword in keywords_list:
+            words.append(keyword['word'])
+
         words_count = len(keywords_list)
-        word_analyzer.write_data(keywords_list, words_count)
+        word_analyzer.write_data(keywords_list, words_count, words)
         return 'dupa'
 
 
