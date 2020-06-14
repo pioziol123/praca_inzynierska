@@ -131,12 +131,7 @@ def list_blocked_users():
     if user_id is not '':
         blocked_users = BlockedUsers.query.filter_by(blocked_by=user_id).all()
         blocked_users_list = [e.serialize() for e in blocked_users]
-        response_object = {
-            'status': 'success',
-            'message': 'Successfully removed keyword from list.',
-            'Users': blocked_users_list
-        }
-        return jsonify({'Response': response_object})
+        return jsonify({'Response': blocked_users_list})
     else:
         return jsonify({'Response': 405})
 
@@ -145,38 +140,39 @@ def list_blocked_users():
 def block_user():
     user_id = request.cookies.get('userId')
     if user_id is not '':
-        name = request.json.get('name')
+        name = request.json.get('user_name')
         if name is None:
             abort(400)
-        keyword_obj = Keywords.query.filter_by(name=name).first()
+        keyword_obj = Users.query.filter_by(email=name).first()
         if keyword_obj is None:
-            abort(Response('Nie ma takiego uzytkownika do zablokowania.'))  # No such word
-        new_word = BlockedUsers
-        new_word.user_name = name
-        new_word.added_at = datetime.datetime.now()
-        new_word.added_by = user_id
+            abort(Response('Nie ma takiego uzytkownika do zablokowania.'))  # No such user
+        query_result = BlockedUsers.query.filter_by(user_name=name, blocked_by=user_id).first()
+        if query_result is not None:
+            abort(Response('Taki uzytkownik juz jest zablokowany.'))  # existing user
+        new_word = BlockedUsers(user_name=name, blocked_by=user_id)
         db.session.add(new_word)
         db.session.commit()
         response_object = {
             'status': 'success',
-            'message': 'Successfully removed keyword from list.'
+            'message': 'Successfully blocked user.',
+            'blocked_user_id': new_word.id
         }
         return jsonify({'Response': response_object})
     else:
         return jsonify({'Response': 405})
 
 
-@application.route('/blocks/{id}', methods=['DELETE'])
+@application.route('/blocks', methods=['DELETE'])
 def unblock_user():
     user_id = request.cookies.get('userId')
     if user_id is not '':
         blocked_user = request.json.get('blocked_user')
         if id is None:
             abort(400)
-        blocked_user = BlockedUsers.query.filter_by(blocked_by=blocked_user).first()
+        blocked_user = BlockedUsers.query.filter_by(user_name=blocked_user, blocked_by=user_id).first()
         if blocked_user is None:
             abort(Response('Nie ma takiego uzytkownika na liscie zablokowanych uzytkownikow.'))
-        db.session.remove(blocked_user)
+        db.session.delete(blocked_user)
         db.session.commit()
         responseObject = {
             'status': 'success',
