@@ -10,13 +10,15 @@ class Keywords(db.Model):
     word = db.Column(db.String(80), index=True, unique=True)
     added_at = db.Column(db.String(200), index=True, unique=False)
     added_by = db.Column(db.Integer, index=True, unique=False)
+    word_topic = db.Column(db.String(200), index=True, unique=False)
 
     def serialize(self):
         return {
             'id': self.id,
             'word': self.word,
             'added_at': self.added_at,
-            'added_by': self.added_by
+            'added_by': self.added_by,
+            'word_topic': self.word_topic
         }
 
 

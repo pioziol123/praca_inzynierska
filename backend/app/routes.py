@@ -100,9 +100,6 @@ def list_keywords():
     if user_id is not '':
         keywords_obj = Keywords.query.filter_by(added_by=str(user_id)).all()
         keywords_list = [e.serialize() for e in keywords_obj]
-
-        for keyword in keywords_list:
-            keyword = keyword.word
         return jsonify(keywords_list)
     else:
         return jsonify({'Response': 405})
@@ -198,8 +195,8 @@ def suggest_word():
     if user_id is not '':
         keywords_obj = Keywords.query.filter_by(added_by=user_id)
         keywords_list = [e.serialize() for e in keywords_obj]
-        words_count = keywords_list.len()
-        word_analyzer.write_data(keywords_list.to_json(), words_count)
+        words_count = len(keywords_list)
+        word_analyzer.write_data(keywords_list, words_count)
         return 'dupa'
 
 
