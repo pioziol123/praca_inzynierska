@@ -78,7 +78,7 @@ def add_keyword():
         keyword = request.json.get('keyword')
         if keyword is None:
             abort(400)
-        new_word = Keywords(keyword=keyword)
+        new_word = Keywords(word=keyword)
         new_word.word = keyword
         new_word.added_at = datetime.datetime.now()
         new_word.added_by = request.cookies.get('userId')
@@ -111,7 +111,7 @@ def remove_keyword():
         keyword = request.json.get('keyword')
         if keyword is None:
             abort(400)
-        keyword_obj = Keywords.query.filter_by(keyword=keyword).first()
+        keyword_obj = Keywords.query.filter_by(word=keyword).first()
         if keyword_obj is None:
             abort(Response('Nie ma takiego slowa w liscie.'))  # No such word
         db.session.remove(keyword_obj)
