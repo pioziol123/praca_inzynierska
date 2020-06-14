@@ -105,7 +105,7 @@ def list_keywords():
         return jsonify({'Response': 405})
 
 
-@application.route('/keywords/{id}', methods=['DELETE'])
+@application.route('/keywords', methods=['DELETE'])
 def remove_keyword():
     if request.cookies.get('userId') is not '':
         keyword = request.json.get('keyword')
@@ -114,7 +114,7 @@ def remove_keyword():
         keyword_obj = Keywords.query.filter_by(word=keyword).first()
         if keyword_obj is None:
             abort(Response('Nie ma takiego slowa w liscie.'))  # No such word
-        db.session.remove(keyword_obj)
+        db.session.delete(keyword_obj)
         db.session.commit()
         response_object = {
             'status': 'success',
