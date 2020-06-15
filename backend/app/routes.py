@@ -38,9 +38,9 @@ def login():
 
 @application.route('/users/logout', methods=['POST'])
 def logout():
-    if request.cookies.get('userId') is not '':
+    if request.cookies.get('userId') is not None:
         result = flask.make_response(jsonify('Successfully logged out'))
-        result.set_cookie('userId', '')
+        result.set_cookie('userId', '', expires=0)
         return result
     else:
         return Response("Brak dostepu", status=405, mimetype='application/json')
@@ -76,7 +76,7 @@ def register():
 @application.route('/keywords', methods=['POST'])
 def add_keyword():
     user_id = request.cookies.get('userId')
-    if user_id is not '':
+    if user_id is not None:
         keyword = request.json.get('keyword')
         if keyword is None:
             abort(400)
@@ -100,7 +100,7 @@ def add_keyword():
 @application.route('/keywords', methods=['GET'])
 def list_keywords():
     user_id = request.cookies.get('userId')
-    if user_id is not '':
+    if user_id is not None:
         keywords_obj = Keywords.query.filter_by(added_by=str(user_id)).all()
         keywords_list = [e.serialize() for e in keywords_obj]
         return jsonify(keywords_list)
@@ -110,7 +110,7 @@ def list_keywords():
 
 @application.route('/keywords', methods=['DELETE'])
 def remove_keyword():
-    if request.cookies.get('userId') is not '':
+    if request.cookies.get('userId') is not None:
         keyword = request.json.get('keyword')
         if keyword is None:
             abort(400)
@@ -131,7 +131,7 @@ def remove_keyword():
 @application.route('/blocks', methods=['GET'])
 def list_blocked_users():
     user_id = request.cookies.get('userId')
-    if user_id is not '':
+    if user_id is not None:
         blocked_users = BlockedUsers.query.filter_by(blocked_by=user_id).all()
         blocked_users_list = [e.serialize() for e in blocked_users]
         return jsonify({'Response': blocked_users_list})
@@ -142,7 +142,7 @@ def list_blocked_users():
 @application.route('/blocks', methods=['POST'])
 def block_user():
     user_id = request.cookies.get('userId')
-    if user_id is not '':
+    if user_id is not None:
         name = request.json.get('user_name')
         if name is None:
             abort(400)
@@ -168,7 +168,7 @@ def block_user():
 @application.route('/blocks', methods=['DELETE'])
 def unblock_user():
     user_id = request.cookies.get('userId')
-    if user_id is not '':
+    if user_id is not None:
         blocked_user = request.json.get('blocked_user')
         if id is None:
             abort(400)
@@ -201,7 +201,7 @@ def suggest_word():
         result = collections.defaultdict(list)
         for i in keywords_list:
             result[i['word_topic']].append(i['word'])
-        word_analyzer.write_data(keywords_list, words_count, words)
+        word_analyzer.write_data(result, words_count, words)
         return 'dupa'
 
 
