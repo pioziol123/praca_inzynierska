@@ -9,7 +9,7 @@ CREATE TABLE mysql.blocked_users (
 
 CREATE TABLE mysql.keywords (
 	id                   int UNSIGNED NOT NULL  AUTO_INCREMENT  PRIMARY KEY,
-	word                 varchar(80)      ,
+	word                 varchar(80) NOT NULL     ,
 	added_at             datetime  NOT NULL DEFAULT CURRENT_TIMESTAMP   ,
 	added_by             varchar(200)  NOT NULL,
 	word_topic           varchar(200)
