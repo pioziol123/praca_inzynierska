@@ -1,8 +1,9 @@
 import {Comment} from '../classes/CommentsList';
 
 function parse(list) {
-    console.info(list.append);
-    [...document.querySelectorAll('#itemsStream .dC')].forEach(function (element) {
+    [...document.querySelectorAll('#itemsStream .dC') || []]
+        .filter(element => element.querySelector('.author .showProfileSummary'))
+        .forEach(function (element) {
             const author = element.querySelector('.author .showProfileSummary').textContent;
             const contentElement = element.querySelector('.text');
             const comment = new Comment(contentElement, author);

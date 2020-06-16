@@ -6,7 +6,7 @@ let keywords = null;
 let api = null;
 function getKeyWords(list) {
     if (!keywords) {
-        keywords = new KeyWords(null, list);
+        keywords = new KeyWords(getApi(), list);
     }
     return keywords;
 }
