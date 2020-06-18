@@ -7,8 +7,6 @@ from flask_bcrypt import check_password_hash
 from app import application, db
 from flask import request, abort, jsonify, Response, make_response, Blueprint
 from app import word_analyzer
-from itertools import groupby
-
 from app.models.user import Users, Keywords, BlockedUsers
 
 auth_blueprint = Blueprint('auth', __name__)
@@ -25,15 +23,17 @@ def login():
     password = request.json.get('password')
     user = Users.query.filter_by(email=email).first()
     if user and check_password_hash(user.password, password):
+        expire_date = datetime.datetime.now()
+        expire_date = expire_date + datetime.timedelta(days=90)
         res = flask.make_response(jsonify(user.id))
-        res.set_cookie('userId', value=str(user.id), httponly=True)
+        res.set_cookie('userId', value=str(user.id), httponly=True, expires=expire_date)
         return res
     else:
-        responseObject = {
+        response_object = {
             'status': 'fail',
             'message': 'User does not exist.'
         }
-        return make_response(jsonify(responseObject)), 404
+        return make_response(jsonify(response_object)), 404
 
 
 @application.route('/users/logout', methods=['POST'])
@@ -52,25 +52,25 @@ def register():
     password = request.json.get('password')
     repeat_password = request.json.get('repeat_password')
     if email is None:
-        abort(Response('Brak adresu email'))  # missing arguments
+        Response("Nalezy podac adres email", status=400, mimetype='application/json')  # missing arguments
     if password is None or repeat_password is None:
-        abort(Response('Nie podano hasla prawidlowo.'))
+        Response("Nieprawidlowo wypelnione haslo", status=400, mimetype='application/json')
     if password != repeat_password:
-        abort(Response('Haslo sie nie zgadza.'))
+        Response("Hasla sie nie zgadzaja", status=400, mimetype='application/json')
     if Users.query.filter_by(email=email).first() is not None:
-        abort(Response('Taki uzytkownik juz istnieje.'))  # existing user
+        Response("Taki uzytkownik juz istnieje", status=400, mimetype='application/json')  # existing user
     user = Users(email=email, password=password)
     user.email = email
     user.created_at = datetime.datetime.now()
     user.last_login = datetime.datetime.now()
     db.session.add(user)
     db.session.commit()
-    responseObject = {
+    response_object = {
         'status': 'success',
         'message': 'Successfully registered.',
         'user_id': user.id,
     }
-    return make_response(jsonify(responseObject)), 201
+    return make_response(jsonify(response_object)), 201
 
 
 @application.route('/keywords', methods=['POST'])
@@ -79,7 +79,9 @@ def add_keyword():
     if user_id is not None:
         keyword = request.json.get('keyword')
         if keyword is None:
-            abort(400)
+            Response("Zly request", status=400, mimetype='application/json')
+        if Keywords.query.filter_by(added_by=user_id, word=keyword).first() is not None:
+            return Response("Takie slowo juz istnieje dla podanego uzytkownika", status=400, mimetype='application/json')
         new_word = Keywords(word=keyword)
         new_word.word = keyword
         new_word.added_at = datetime.datetime.now()
@@ -177,11 +179,11 @@ def unblock_user():
             abort(Response('Nie ma takiego uzytkownika na liscie zablokowanych uzytkownikow.'))
         db.session.delete(blocked_user)
         db.session.commit()
-        responseObject = {
+        response_object = {
             'status': 'success',
             'message': 'Successfully unblocked user.'
         }
-        return jsonify({'Response': responseObject})
+        return jsonify({'Response': response_object})
     else:
         return Response("Brak dostepu", status=405, mimetype='application/json')
 
@@ -189,19 +191,21 @@ def unblock_user():
 @application.route('/detection', methods=['GET'])
 def suggest_word():
     user_id = request.cookies.get('userId')
-    # words = request.cookies.get('word')
+    word_topic = request.json.get('word_topic')
     same_word_count = 4
     if user_id is not '':
         keywords_obj = Keywords.query.filter_by(added_by=user_id)
         keywords_list = [e.serialize() for e in keywords_obj]
-        words = []
+        words_topic = []
         for keyword in keywords_list:
-            words.append(keyword['word'])
+            record = Keywords.query.filter_by(word_topic=keyword['word_topic']).first()
+            words_topic.append(record)
         words_count = len(keywords_list)
+        attr = [o.word for o in words_topic]
         result = collections.defaultdict(list)
         for i in keywords_list:
-            result[i['word_topic']].append(i['word'])
-        word_analyzer.write_data(result, words_count, words)
+            result[i['word']].append(i['word_topic'])
+        word_analyzer.write_data(result, words_count, words_topic)
         return 'dupa'
 
 
