@@ -91,7 +91,7 @@
 "use strict";
 
 
-var bind = __webpack_require__(1);
+var bind = __webpack_require__(2);
 
 /*global toString:true*/
 
@@ -439,6 +439,12 @@ module.exports = {
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
+module.exports = __webpack_require__(10);
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
 "use strict";
 
 
@@ -454,7 +460,7 @@ module.exports = function bind(fn, thisArg) {
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -532,7 +538,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -544,7 +550,7 @@ module.exports = function isCancel(value) {
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -567,10 +573,10 @@ function getDefaultAdapter() {
   var adapter;
   if (typeof XMLHttpRequest !== 'undefined') {
     // For browsers use XHR adapter
-    adapter = __webpack_require__(5);
+    adapter = __webpack_require__(6);
   } else if (typeof process !== 'undefined' && Object.prototype.toString.call(process) === '[object process]') {
     // For node use HTTP adapter
-    adapter = __webpack_require__(5);
+    adapter = __webpack_require__(6);
   }
   return adapter;
 }
@@ -649,7 +655,7 @@ module.exports = defaults;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(15)))
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -657,11 +663,11 @@ module.exports = defaults;
 
 var utils = __webpack_require__(0);
 var settle = __webpack_require__(17);
-var buildURL = __webpack_require__(2);
+var buildURL = __webpack_require__(3);
 var buildFullPath = __webpack_require__(19);
 var parseHeaders = __webpack_require__(22);
 var isURLSameOrigin = __webpack_require__(23);
-var createError = __webpack_require__(6);
+var createError = __webpack_require__(7);
 
 module.exports = function xhrAdapter(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -836,7 +842,7 @@ module.exports = function xhrAdapter(config) {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -861,7 +867,7 @@ module.exports = function createError(message, config, code, request, response) 
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -941,7 +947,7 @@ module.exports = function mergeConfig(config1, config2) {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -967,12 +973,6 @@ module.exports = Cancel;
 
 
 /***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(10);
-
-/***/ }),
 /* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -980,10 +980,10 @@ module.exports = __webpack_require__(10);
 
 
 var utils = __webpack_require__(0);
-var bind = __webpack_require__(1);
+var bind = __webpack_require__(2);
 var Axios = __webpack_require__(11);
-var mergeConfig = __webpack_require__(7);
-var defaults = __webpack_require__(4);
+var mergeConfig = __webpack_require__(8);
+var defaults = __webpack_require__(5);
 
 /**
  * Create an instance of Axios
@@ -1016,9 +1016,9 @@ axios.create = function create(instanceConfig) {
 };
 
 // Expose Cancel & CancelToken
-axios.Cancel = __webpack_require__(8);
+axios.Cancel = __webpack_require__(9);
 axios.CancelToken = __webpack_require__(25);
-axios.isCancel = __webpack_require__(3);
+axios.isCancel = __webpack_require__(4);
 
 // Expose all/spread
 axios.all = function all(promises) {
@@ -1040,10 +1040,10 @@ module.exports.default = axios;
 
 
 var utils = __webpack_require__(0);
-var buildURL = __webpack_require__(2);
+var buildURL = __webpack_require__(3);
 var InterceptorManager = __webpack_require__(12);
 var dispatchRequest = __webpack_require__(13);
-var mergeConfig = __webpack_require__(7);
+var mergeConfig = __webpack_require__(8);
 
 /**
  * Create a new instance of Axios
@@ -1201,8 +1201,8 @@ module.exports = InterceptorManager;
 
 var utils = __webpack_require__(0);
 var transformData = __webpack_require__(14);
-var isCancel = __webpack_require__(3);
-var defaults = __webpack_require__(4);
+var isCancel = __webpack_require__(4);
+var defaults = __webpack_require__(5);
 
 /**
  * Throws a `Cancel` if cancellation has been requested.
@@ -1521,7 +1521,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 "use strict";
 
 
-var createError = __webpack_require__(6);
+var createError = __webpack_require__(7);
 
 /**
  * Resolve or reject a Promise based on response status.
@@ -1866,7 +1866,7 @@ module.exports = (
 "use strict";
 
 
-var Cancel = __webpack_require__(8);
+var Cancel = __webpack_require__(9);
 
 /**
  * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -1965,113 +1965,6 @@ module.exports = function spread(callback) {
 // ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
 
-// CONCATENATED MODULE: ./src/classes/KeyWords.js
-class KeyWords {
-  constructor(api, commentsList) {
-    this.api = api;
-    this.list = [];
-    this.commentsList = commentsList;
-    //this.list = this.api.getUserWordsList();
-  }
-
-  add(word) {
-    if (this.list.find(kw => kw === word)) return;
-    this.list.push(word);
-    this.commentsList.blockForKeyword(word);
-    // this.api.addWordToList(list);
-  }
-
-  delete(word) {
-    if (!this.list.find(kw => kw === word)) return;
-    this.list = this.list.filter(kw => kw !== word);
-    this.commentsList.unblockForKeyword(word);
-    this.list.forEach(kw => this.commentsList.blockForKeyword(kw));
-    // this.api.deleteWordFromList(word);
-  }
-}
-
-/* harmony default export */ var classes_KeyWords = (KeyWords);
-
-// EXTERNAL MODULE: ./node_modules/axios/index.js
-var axios = __webpack_require__(9);
-var axios_default = /*#__PURE__*/__webpack_require__.n(axios);
-
-// CONCATENATED MODULE: ./src/classes/Connector.js
-
-
-class Connector_Connector {
-    async post(uri, payload) {
-        const response = await axios_default.a.post(Connector_Connector.url + uri, payload);
-        console.info(response);
-        return {success: response.status < 300, data: response.data};
-    }
-
-    async get(uri, payload) {
-        
-    }      
-}
-
-Connector_Connector.register = 'user';
-Connector_Connector.login = 'login';
-Connector_Connector.url = "http://127.0.0.1/"
-/* harmony default export */ var classes_Connector = (Connector_Connector);
-// CONCATENATED MODULE: ./src/classes/Api.js
-
-
-const cookieName = 'filter-account-cookie';
-
-function setCookie(cookie) {
-    const date = (new Date(Date.now() + 1000 * 60 * 60 * 24)).toUTCString();
-    document.cookie = `${cookieName}=${cookie}; expires=${date};`;
-}
-
-function getCookie(cookie) {
-
-}
-
-class Api_Api {
-    constructor(connector) {
-        this.connector = connector;
-    }
-
-    async register(username, password, reapeatPassword) {
-        const body = {username: username, password: password, repeat_password: reapeatPassword}
-        return await this.connector.post(classes_Connector.register, body);
-    }
-
-    async login(username, password) {
-        const body = {username: username, password: password}
-        const result =  await this.connector.post(classes_Connector.login, body);
-        console.info(result);
-        setCookie(result.data.auth_token);
-        return result;    
-    }
-}
-
-/* harmony default export */ var classes_Api = (Api_Api);
-// CONCATENATED MODULE: ./src/classes/Repository.js
-// import config from "./config";
-
-
-
-let Repository_keywords = null;
-let api = null;
-function getKeyWords(list) {
-    if (!Repository_keywords) {
-        Repository_keywords = new classes_KeyWords(null, list);
-    }
-    return Repository_keywords;
-}
-
-function getApi() {
-    if (!api) {
-        const connector = new classes_Connector();
-        api = new classes_Api(connector);
-    }
-    return api;
-}
-
-
 // CONCATENATED MODULE: ./src/components/menutoggle.component.js
 class MenuToogle extends HTMLAnchorElement {
   constructor(...args) {
@@ -2094,6 +1987,182 @@ class MenuToogle extends HTMLAnchorElement {
 
 customElements.define("menu-toggle-component", MenuToogle, { extends: "a" });
 /* harmony default export */ var menutoggle_component = (MenuToogle);
+
+// CONCATENATED MODULE: ./src/classes/KeyWords.js
+class KeyWords {
+  constructor(api, commentsList) {
+    this.api = api;
+    this.list = [];
+    this.subscribers = [];
+    this.commentsList = commentsList;
+    this.load();
+  }
+
+  add(word) {
+    if (this.list.find(kw => kw === word)) return;
+    this.list.push(word);
+    this.commentsList.blockForKeyword(word);
+    return this.api.addWordToList(word);
+  }
+
+  delete(word) {
+    if (!this.list.find(kw => kw === word)) return;
+    this.list = this.list.filter(kw => kw !== word);
+    this.commentsList.unblockForKeyword(word);
+    this.list.forEach(kw => this.commentsList.blockForKeyword(kw));
+    return this.api.deleteWordFromList(word);
+  }
+
+  subscribe(subscriber) {
+    this.subscribers.push(subscriber);
+  }
+
+  notifyAll(event) {
+    this.subscribers.forEach(subscriber => {
+      subscriber.notify({event: event})
+    });
+  }
+  load() {
+    this.api.getUserWordsList()
+      .then(wordList => {
+        this.list = wordList;
+        this.notifyAll('loaded');
+      });
+  }
+  
+}
+
+/* harmony default export */ var classes_KeyWords = (KeyWords);
+
+// EXTERNAL MODULE: ./node_modules/axios/index.js
+var axios = __webpack_require__(1);
+var axios_default = /*#__PURE__*/__webpack_require__.n(axios);
+
+// CONCATENATED MODULE: ./src/classes/Connector.js
+
+
+class Connector_Connector {
+    async post(uri, payload) {
+        try {
+            const response = await axios_default.a.post(Connector_Connector.url + uri, payload);
+            return {success: response.status < 300, data: response.data};
+        } catch (e) {   
+            console.error(e.message);
+            return {success: false, data: {}};
+        }
+    }
+
+    async get(uri) {
+        try {
+            const response = await axios_default.a.get(Connector_Connector.url + uri);
+            return {success: response.status < 300, data: response.data};
+        }catch (e) {   
+            console.error(e.message);
+            return {success: false, data: {}};
+        }
+    }    
+    
+    async delete(uri, payload) {
+        try {
+            const response = await axios_default.a.delete(Connector_Connector.url + uri, {data: payload});
+            return {success: response.status < 300, data: response.data};
+        } catch (e) {
+            console.error(e.message);
+            return {success: false, data: {}};  
+        }
+    }
+}
+
+Connector_Connector.keywords = 'keywords';
+Connector_Connector.register = 'user';
+Connector_Connector.login = 'users/login';
+Connector_Connector.logout = 'users/logout';
+Connector_Connector.url = "http://127.0.0.1/"
+/* harmony default export */ var classes_Connector = (Connector_Connector);
+// CONCATENATED MODULE: ./src/classes/Api.js
+
+
+const cookieName = 'userId';
+
+function removeCookie() {
+    document.cookie = `${cookieName}=filter-cookie-hash; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
+}
+
+
+function setCookie(cookie) {
+    const date = (new Date(Date.now() + 1000 * 60 * 60 * 24)).toUTCString();
+    document.cookie = `${cookieName}=${cookie}; expires=${date};`;
+}
+
+function getCookie() {
+    const cookie = document.cookie.split(';')
+        .find(cookie => cookie.includes(cookieName));
+    if (!cookie || cookie.length === 0) return '';
+    return cookie.split('=').pop();
+}
+
+class Api_Api {
+    constructor(connector) {
+        this.connector = connector;
+    }
+
+    async register(username, password, reapeatPassword) {
+        const body = {username: username, password: password, repeat_password: reapeatPassword}
+        return await this.connector.post(classes_Connector.register, body);
+    }
+
+    async login(username, password) {
+        const body = {username: username, password: password}
+        return await this.connector.post(classes_Connector.login, body);
+    }
+
+    async logout() {
+        return await this.connector.post(classes_Connector.logout, null);
+    }
+
+    async isLogged() {
+        const result =  await this.connector.get(classes_Connector.keywords, null);
+        return result.success && !result.data.Response; 
+        
+    }
+
+    async getUserWordsList() {
+        return (await this.connector.get(classes_Connector.keywords, null)).data.map(word => word.word)
+    }
+
+    async addWordToList(word) {
+        return (await this.connector.post(classes_Connector.keywords, {keyword: word})).success;
+    }
+
+    async deleteWordFromList(word) {
+        return (await this.connector.delete(classes_Connector.keywords, {keyword: word})).success;
+    } 
+}
+
+/* harmony default export */ var classes_Api = (Api_Api);
+
+// CONCATENATED MODULE: ./src/classes/Repository.js
+// import config from "./config";
+
+
+
+let Repository_keywords = null;
+let api = null;
+function getKeyWords(list) {
+    if (!Repository_keywords) {
+        Repository_keywords = new classes_KeyWords(getApi(), list);
+    }
+    return Repository_keywords;
+}
+
+function getApi() {
+    if (!api) {
+        const connector = new classes_Connector();
+        api = new classes_Api(connector);
+    }
+    return api;
+}
+
 
 // CONCATENATED MODULE: ./src/components/keyword.component.js
 
@@ -2127,33 +2196,25 @@ customElements.define("keyword-component", keyword_component_KeyWord, { extends:
 
 
 const wordlist_component_template = `
-<div>
-    <ul class="newregister-drop">
-    <li>
-                <div  id="add-keyword-button" class="inlblk vertical-top m-reset-width">
-                   <input /><input type="button" value="Dodaj">
-                </div>
-            <div id="keyword-list" class="inlblk vertical-top m-reset-width"></div>
-        </li>
-    </ul>
+<div  id="add-keyword-button" class="inlblk vertical-top m-reset-width">
+    <input  /><input type="button" value="Dodaj">
 </div>
+<div id="keyword-list" class="inlblk vertical-top m-reset-width"></div>
 `;
 
-class wordlist_component_WordList extends HTMLDivElement {
+class wordlist_component_WordList extends HTMLLIElement {
   constructor() {
     super();
-    this.id = "main-div";
-    this.setAttribute("class", "dropdown right");
-    this.style = `margin-left:-230px;display:block;`;
+    getKeyWords().subscribe(this);
     this.innerHTML = wordlist_component_template;
-  }
 
-  connectedCallback() {
-    const keywords = getKeyWords();
-    const list = this.querySelector("#keyword-list");
-    list.innerHTML = keywords.list
-      .map(keyword => `<div is="keyword-component" data-name="${keyword}"></div>`)
-      .join("");
+    this.reload = () => {
+      this.parentElement.replaceChild(
+        document.createElement("li", { is: "word-list-component" }),
+        this
+      );
+    }
+
     this.handleAddWordList = () => {
       const regex = /[^\w\.!@#$%^&*()\[\]{};:'",<>]/;
       const word = this.querySelector(
@@ -2161,13 +2222,24 @@ class wordlist_component_WordList extends HTMLDivElement {
       ).value.replace(regex, "");
       if (word.length === 0) return;
       this.querySelector("#add-keyword-button input").value = "";
-      getKeyWords().add(word);
-      this.parentElement.replaceChild(
-        document.createElement("div", { is: "word-list-component" }),
-        this
-      );
+      getKeyWords().add(word).then(() => this.reload());
     };
 
+    this.notify =  ({event}) => {
+      if (event !== 'loaded') return;
+      this.reload();
+    }
+
+    getKeyWords().load();
+  }
+
+  connectedCallback() {
+    const keywords = getKeyWords();
+    
+    const list = this.querySelector("#keyword-list");
+    list.innerHTML = keywords.list
+      .map(keyword => `<div is="keyword-component" data-name="${keyword}"></div>`)
+      .join("");
     document
       .querySelector("#add-keyword-button")
       .addEventListener("click", () => this.handleAddWordList());
@@ -2180,54 +2252,53 @@ class wordlist_component_WordList extends HTMLDivElement {
   }
 }
 
-customElements.define("word-list-component", wordlist_component_WordList, { extends: "div" });
+customElements.define("word-list-component", wordlist_component_WordList, { extends: "li" });
 /* harmony default export */ var wordlist_component = (wordlist_component_WordList);
 
-// CONCATENATED MODULE: ./src/components/registerform.component.js
+// CONCATENATED MODULE: ./src/components/register.component.js
 
 
-const registerform_component_template = `
-<div>
-	<ul class="newregister-drop">
-   <li>
-      <form id="filterRegisterForm">
-				<div>
-				<label for="newregister-login">Username</label>
-					<input type="text" name="username" id="newregister-login">
-        </div>
-        <div>
-          <label for="newregister-pass">Hasło</label>
-          <input type="password" name="password" id="newregister-pass">
-        </div>
-        <div>
-          <label for="newregister-pass-repeat">Powtórz hasło</label>
-          <input type="password" name="repeat_password" id="newregister-pass-repeat">
-        </div>
-        <fieldset class="row buttons">
-          <p> 
-            <input type="submit" value="Rejestruj">
-          </p>
-        </fieldset>
-      </form>
-      <a id="filterBack">Powrót</a>
-		</li>
-	</ul>
-</div>
+const register_component_template = `
+<form id="filterRegisterForm">
+  <div>
+  <label for="newregister-login">Username</label>
+    <input type="text" name="username" id="newregister-login">
+  </div>
+  <div>
+    <label for="newregister-pass">Hasło</label>
+    <input type="password" name="password" id="newregister-pass">
+  </div>
+  <div>
+    <label for="newregister-pass-repeat">Powtórz hasło</label>
+    <input type="password" name="repeat_password" id="newregister-pass-repeat">
+  </div>
+  <fieldset class="row buttons">
+    <p> 
+      <input type="submit" value="Rejestruj">
+    </p>
+  </fieldset>
+</form>
+<a id="filterBack">Powrót</a>
 `;
 
 const templateSuccess = `
-<div><ul class="newregister-drop"><li style="margin-top:10px;margin-bottom:10px;text-align: center; font-size: 30px;><span"><span class="results hot"><i class="icon tiny hot"></i>  <strong>Pomyślnie zarejestrowano!</strong></span></span></li><li><a id="filterBack">Powrót</a></li></ul></div>
+<div style="margin-top:10px;margin-bottom:10px;text-align: center; font-size: 30px;">
+  <span class="results hot">
+    <i class="icon tiny hot"></i>
+    <strong>Pomyślnie zarejestrowano!</strong>
+  </span>
+</div>
+<a id="filterBack">Powrót</a>
 `;
-class registerform_component_RegisterForm extends HTMLDivElement {
+class register_component_Register extends HTMLLIElement {
   constructor() {
     super();
-    this.innerHTML = registerform_component_template;
+    this.innerHTML = register_component_template;
     this.addReturnToButton = e => {
       this.querySelector("#filterBack").addEventListener("click", e => {
         e.preventDefault();
-        document.cookie = `filter-account-cookie=filter-cookie-hash; expires=Thu, 01 Jan 2200 00:00:00 UTC;`;
         this.parentElement.replaceChild(
-          document.createElement("div", { is: "loginform-component" }),
+          document.createElement("li", { is: "login-component" }),
           this
         );
       });
@@ -2251,42 +2322,91 @@ class registerform_component_RegisterForm extends HTMLDivElement {
   }
 }
 
-customElements.define("registerform-component", registerform_component_RegisterForm, { extends: "div" });
-/* harmony default export */ var registerform_component = (registerform_component_RegisterForm);
+customElements.define("register-component", register_component_Register, { extends: "li" });
+/* harmony default export */ var register_component = (register_component_Register);
 
-// CONCATENATED MODULE: ./src/components/loginform.component.js
-
-
+// CONCATENATED MODULE: ./src/components/logout.component.js
 
 
-const loginform_component_template = `
-<div>
-	<ul class="newregister-drop">
-   <li>
-      <form id="filterLoginForm">
-				<div>
-				<label for="newregister-login">Login</label>
-					<input type="text" name="username" id="newregister-login">
-        </div>
-        <div>
-          <label for="newregister-pass">Hasło</label>
-          <input type="password" name="password" id="newregister-pass">
-        </div>
-        <fieldset class="row buttons">
-          <p> 
-            <input type="submit" value="Zaloguj się">
-          </p>
-        </fieldset>
-      </form>
-      <a id="filterRegister">Rejestracja</a>
-		</li>
-	</ul>
-</div>
+
+const logout_component_template = `<a>Wyloguj</a>`;
+
+class logout_component_Logout extends HTMLLIElement
+{
+    constructor() {
+        super();
+        this.innerHTML = logout_component_template;
+        this.subscribers = [];
+        this.subscribe = (subscriber) => {
+            this.subscribers.push(subscriber);
+        }
+  
+        this.notifyAll = (event) => {
+            console.info(event, 'event logout component');
+            this.subscribers.forEach(subscriber => {
+                subscriber.notify({event: event})
+            });
+        }
+    }
+
+    connectedCallback() {
+        this.querySelector('a').addEventListener('click', e => {
+            e.preventDefault();
+            getApi().logout().then(result => {
+                console.info(result);
+                console.info(!result.success, 'negate loggout result');
+                if (!result.success) {
+                    return;
+                }
+                console.info('before notificaton after logged out');
+                this.notifyAll('loggedOut');
+            });
+        })
+    }
+}
+
+customElements.define("logout-component", logout_component_Logout, { extends: "li" });
+/* harmony default export */ var logout_component = (logout_component_Logout);
+
+// CONCATENATED MODULE: ./src/components/login.component.js
+
+
+
+
+
+const login_component_template = `
+<form id="filterLoginForm">
+  <div>
+  <label for="newregister-login">Login</label>
+    <input type="text" name="username" id="newregister-login">
+  </div>
+  <div>
+    <label for="newregister-pass">Hasło</label>
+    <input type="password" name="password" id="newregister-pass">
+  </div>
+  <fieldset class="row buttons">
+    <p> 
+      <input type="submit" value="Zaloguj się">
+    </p>
+  </fieldset>
+</form>
+<a id="filterRegister">Rejestracja</a>
 `;
-class loginform_component_LoginForm extends HTMLDivElement {
+
+class login_component_Login extends HTMLLIElement {
   constructor() {
     super();
-    this.innerHTML = loginform_component_template;
+    this.innerHTML = login_component_template; 
+    this.subscribers = [];
+    this.subscribe = (subscriber) => {
+      this.subscribers.push(subscriber);
+    }
+  
+    this.notifyAll = (event) => {
+      this.subscribers.forEach(subscriber => {
+        subscriber.notify({event: event})
+      });
+    }
   }
 
   connectedCallback() {
@@ -2296,76 +2416,72 @@ class loginform_component_LoginForm extends HTMLDivElement {
       const password = e.target['password'].value;
       getApi().login(username, password).then(result => {
         if (!result.success) return;
-        this.parentElement.replaceChild(
-          document.createElement("div", { is: "word-list-component" }),
-          this
-        );
+        this.notifyAll('loggedIn');
       });
     });
     this.querySelector("#filterRegister").addEventListener("click", e => {
         e.preventDefault();
         this.parentElement.replaceChild(
-          document.createElement("div", { is: "registerform-component" }),
+          document.createElement("li", { is: "register-component" }),
           this
         );
       });
   }
 }
 
-customElements.define("loginform-component", loginform_component_LoginForm, { extends: "div" });
-/* harmony default export */ var loginform_component = (loginform_component_LoginForm);
-
-// CONCATENATED MODULE: ./src/components/login.component.js
-
-
-const login_component_template = `
-<div>
-	<div is="loginform-component" />
-</div>
-`;
-class Login extends HTMLDivElement {
-  constructor() {
-    super();
-    this.id = "main-div";
-    this.setAttribute("class", "dropdown right");
-    this.style = "margin-left:-230px;";
-    this.innerHTML = login_component_template;
-  }
-
-  connectedCallback() {}
-}
-
-customElements.define("login-component", Login, { extends: "div" });
-/* harmony default export */ var login_component = (Login);
+customElements.define("login-component", login_component_Login, { extends: "li" });
+/* harmony default export */ var login_component = (login_component_Login);
 
 // CONCATENATED MODULE: ./src/components/app.component.js
 
 
 
 
-class App extends HTMLLIElement {
+
+
+const app_component_template = `
+<div id="main-div" class="dropdown right" style="margin-left:-230px;">
+  <div>
+    <ul id="filter-components" class="newregister-drop">
+    </ul>
+  <div>
+</div>
+`;
+
+class app_component_App extends HTMLLIElement {
   constructor() {
     super();
+    this.innerHTML = app_component_template;
     this.appendChild(
       document.createElement("a", { is: "menu-toggle-component" })
     );
-    this.loginForm = document.createElement("div", { is: "login-component" });
-    this.wordList = document.createElement("div", {
-      is: "word-list-component"
-    });
-    this.isLogged = function() {
-      return Boolean(
-        document.cookie
-          .split(";")
-          .map(cookie => cookie.split("=")[0])
-          .find(e => e === "filter-account-cookie")
+    this.notify = ({event}) => {
+      this.parentElement.replaceChild(
+        document.createElement("li", { is: "filter-app-component" }),
+        this
       );
-    };
-    this.appendChild(this.isLogged() ? this.wordList : this.loginForm);
+    }
+  }
+
+  connectedCallback() {
+    getApi().isLogged().then(success => {
+      if (success) {
+        this.querySelector('#filter-components').appendChild(
+          document.createElement('li', { is: 'word-list-component'})
+        );
+        const logoutComponent = document.createElement('li', { is: 'logout-component'});
+        logoutComponent.subscribe(this);
+        this.querySelector('#filter-components').appendChild(logoutComponent);
+      } else {
+        const loginComponent = document.createElement('li', { is: "login-component" });
+        loginComponent.subscribe(this);
+        this.querySelector('#filter-components').appendChild(loginComponent);
+      }
+    });
   }
 }
-customElements.define("filter-app-component", App, { extends: "li" });
-/* harmony default export */ var app_component = (App);
+customElements.define("filter-app-component", app_component_App, { extends: "li" });
+/* harmony default export */ var app_component = (app_component_App);
 
 // CONCATENATED MODULE: ./src/classes/CommentsList.js
 class CommentsList {
@@ -2437,8 +2553,9 @@ class Comment {
 
 
 function parse(list) {
-    console.info(list.append);
-    [...document.querySelectorAll('#itemsStream .dC')].forEach(function (element) {
+    [...document.querySelectorAll('#itemsStream .dC') || []]
+        .filter(element => element.querySelector('.author .showProfileSummary'))
+        .forEach(function (element) {
             const author = element.querySelector('.author .showProfileSummary').textContent;
             const contentElement = element.querySelector('.text');
             const comment = new Comment(contentElement, author);
@@ -2472,21 +2589,16 @@ function addPicker(element, comment) {
 
 
 
+const app_list = new CommentsList();
+wykop_parser(app_list);
+
+const wordList = getKeyWords(app_list);
+
 const menu = document.getElementById("openNaturalSearch");
-document.cookie = `filter-account-cookie=filter-cookie-hash; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
 const menuElement = document.createElement("li", {
   is: "filter-app-component"
 });
 menu.parentNode.parentNode.appendChild(menuElement);
-
-const app_list = new CommentsList();
-wykop_parser(app_list);
-
-
-const app_keywords = getKeyWords(app_list);
-app_keywords.add("bzdury");
-app_keywords.add("do");
-app_keywords.add("Zanim");
 
 
 /***/ })

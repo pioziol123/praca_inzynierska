@@ -2,33 +2,25 @@ import {getKeyWords} from "../classes/Repository";
 import KeyWord from "./keyword.component";
 
 const template = `
-<div>
-    <ul class="newregister-drop">
-    <li>
-                <div  id="add-keyword-button" class="inlblk vertical-top m-reset-width">
-                   <input /><input type="button" value="Dodaj">
-                </div>
-            <div id="keyword-list" class="inlblk vertical-top m-reset-width"></div>
-        </li>
-    </ul>
+<div  id="add-keyword-button" class="inlblk vertical-top m-reset-width">
+    <input  /><input type="button" value="Dodaj">
 </div>
+<div id="keyword-list" class="inlblk vertical-top m-reset-width"></div>
 `;
 
-class WordList extends HTMLDivElement {
+class WordList extends HTMLLIElement {
   constructor() {
     super();
-    this.id = "main-div";
-    this.setAttribute("class", "dropdown right");
-    this.style = `margin-left:-230px;display:block;`;
+    getKeyWords().subscribe(this);
     this.innerHTML = template;
-  }
 
-  connectedCallback() {
-    const keywords = getKeyWords();
-    const list = this.querySelector("#keyword-list");
-    list.innerHTML = keywords.list
-      .map(keyword => `<div is="keyword-component" data-name="${keyword}"></div>`)
-      .join("");
+    this.reload = () => {
+      this.parentElement.replaceChild(
+        document.createElement("li", { is: "word-list-component" }),
+        this
+      );
+    }
+
     this.handleAddWordList = () => {
       const regex = /[^\w\.!@#$%^&*()\[\]{};:'",<>]/;
       const word = this.querySelector(
@@ -36,13 +28,24 @@ class WordList extends HTMLDivElement {
       ).value.replace(regex, "");
       if (word.length === 0) return;
       this.querySelector("#add-keyword-button input").value = "";
-      getKeyWords().add(word);
-      this.parentElement.replaceChild(
-        document.createElement("div", { is: "word-list-component" }),
-        this
-      );
+      getKeyWords().add(word).then(() => this.reload());
     };
 
+    this.notify =  ({event}) => {
+      if (event !== 'loaded') return;
+      this.reload();
+    }
+
+    getKeyWords().load();
+  }
+
+  connectedCallback() {
+    const keywords = getKeyWords();
+    
+    const list = this.querySelector("#keyword-list");
+    list.innerHTML = keywords.list
+      .map(keyword => `<div is="keyword-component" data-name="${keyword}"></div>`)
+      .join("");
     document
       .querySelector("#add-keyword-button")
       .addEventListener("click", () => this.handleAddWordList());
@@ -55,5 +58,5 @@ class WordList extends HTMLDivElement {
   }
 }
 
-customElements.define("word-list-component", WordList, { extends: "div" });
+customElements.define("word-list-component", WordList, { extends: "li" });
 export default WordList;
