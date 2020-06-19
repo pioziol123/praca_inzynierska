@@ -23,6 +23,15 @@ CREATE TABLE mysql.users (
 	last_login           datetime  NOT NULL DEFAULT CURRENT_TIMESTAMP
  );
 
+CREATE TABLE mysql.comments (
+    id                   int UNSIGNED NOT NULL  AUTO_INCREMENT  PRIMARY KEY,
+	keyword              varchar(320)      ,
+	added_by             varchar(255)      ,
+	added_at             datetime  NOT NULL DEFAULT CURRENT_TIMESTAMP   ,
+	word_topic           varchar(200),
+	author               varchar(200)
+)
+
 INSERT INTO mysql.keywords( id, word, added_at, added_by, word_topic ) VALUES ( 1, 'dupa', '2020-04-20 18:39:44', '', 'polska' );
 INSERT INTO mysql.keywords( id, word, added_at, added_by, word_topic ) VALUES ( 2, 'szmata', '2020-05-03 18:11:08', '1', 'usa' );
 INSERT INTO mysql.keywords( id, word, added_at, added_by, word_topic ) VALUES ( 3, 'jebac', '2020-04-20 18:39:44', '', 'wybory' );

@@ -77,3 +77,27 @@ class BlockedUsers(db.Model):
         }
 
 
+class Comments(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    keyword = db.Column(db.String(200), index=True, unique=False)
+    added_by = db.Column(db.Integer, index=True, unique=False)
+    added_at = db.Column(db.DateTime, index=True, unique=False)
+    word_topic = db.Column(db.String(200), index=True, unique=False)
+    author = db.Column(db.String(200), index=True, unique=False)
+
+    def __init__(self, keyword, added_by, word_topic, author):
+        self.keyword = keyword
+        self.added_by = added_by
+        self.added_at = datetime.datetime.now()
+        self.word_topic = word_topic
+        self.author = author
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'keyword': self.keyword,
+            'added_by': self.added_by,
+            'added_at': self.added_at,
+            'word_topic': self.word_topic,
+            'author': self.author
+        }
