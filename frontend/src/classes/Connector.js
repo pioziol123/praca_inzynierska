@@ -4,6 +4,7 @@ class Connector {
     async post(uri, payload) {
         try {
             const response = await axios.post(Connector.url + uri, payload);
+            console.debug("post", response.data, response.status, uri, payload);
             return {success: response.status < 300, data: response.data};
         } catch (e) {   
             console.error(e.message);
@@ -14,6 +15,7 @@ class Connector {
     async get(uri) {
         try {
             const response = await axios.get(Connector.url + uri);
+            console.debug("get", response.data, response.status, uri);
             return {success: response.status < 300, data: response.data};
         }catch (e) {   
             console.error(e.message);
@@ -24,6 +26,7 @@ class Connector {
     async delete(uri, payload) {
         try {
             const response = await axios.delete(Connector.url + uri, {data: payload});
+            console.debug("delete", response.data, response.status, uri, payload);
             return {success: response.status < 300, data: response.data};
         } catch (e) {
             console.error(e.message);
@@ -33,6 +36,7 @@ class Connector {
 }
 
 Connector.keywords = 'keywords';
+Connector.users = 'blocks';
 Connector.register = 'user';
 Connector.login = 'users/login';
 Connector.logout = 'users/logout';

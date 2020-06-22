@@ -2027,6 +2027,7 @@ class KeyWords {
       .then(wordList => {
         this.list = wordList;
         this.notifyAll('loaded');
+        this.list.forEach(word => this.commentsList.blockForKeyword(word));
       });
   }
   
@@ -2045,6 +2046,7 @@ class Connector_Connector {
     async post(uri, payload) {
         try {
             const response = await axios_default.a.post(Connector_Connector.url + uri, payload);
+            console.debug("post", response.data, response.status, uri, payload);
             return {success: response.status < 300, data: response.data};
         } catch (e) {   
             console.error(e.message);
@@ -2055,6 +2057,7 @@ class Connector_Connector {
     async get(uri) {
         try {
             const response = await axios_default.a.get(Connector_Connector.url + uri);
+            console.debug("get", response.data, response.status, uri);
             return {success: response.status < 300, data: response.data};
         }catch (e) {   
             console.error(e.message);
@@ -2065,6 +2068,7 @@ class Connector_Connector {
     async delete(uri, payload) {
         try {
             const response = await axios_default.a.delete(Connector_Connector.url + uri, {data: payload});
+            console.debug("delete", response.data, response.status, uri, payload);
             return {success: response.status < 300, data: response.data};
         } catch (e) {
             console.error(e.message);
@@ -2074,6 +2078,7 @@ class Connector_Connector {
 }
 
 Connector_Connector.keywords = 'keywords';
+Connector_Connector.users = 'blocks';
 Connector_Connector.register = 'user';
 Connector_Connector.login = 'users/login';
 Connector_Connector.logout = 'users/logout';
@@ -2081,25 +2086,6 @@ Connector_Connector.url = "http://127.0.0.1/"
 /* harmony default export */ var classes_Connector = (Connector_Connector);
 // CONCATENATED MODULE: ./src/classes/Api.js
 
-
-const cookieName = 'userId';
-
-function removeCookie() {
-    document.cookie = `${cookieName}=filter-cookie-hash; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
-}
-
-
-function setCookie(cookie) {
-    const date = (new Date(Date.now() + 1000 * 60 * 60 * 24)).toUTCString();
-    document.cookie = `${cookieName}=${cookie}; expires=${date};`;
-}
-
-function getCookie() {
-    const cookie = document.cookie.split(';')
-        .find(cookie => cookie.includes(cookieName));
-    if (!cookie || cookie.length === 0) return '';
-    return cookie.split('=').pop();
-}
 
 class Api_Api {
     constructor(connector) {
@@ -2137,20 +2123,78 @@ class Api_Api {
     async deleteWordFromList(word) {
         return (await this.connector.delete(classes_Connector.keywords, {keyword: word})).success;
     } 
+
+    async addUserToList(user) {
+        return (await this.connector.post(classes_Connector.users, {user_name: user})).success;
+    }
+
+    async deleteUserFromList(user) {
+        return (await this.connector.delete(classes_Connector.users, {blocked_user: user})).success;
+    }
+
+    async getBlockedUserList() {
+        return (await this.connector.get(classes_Connector.users, null)).data.Response.map(user => user.user_name);
+    }
 }
 
 /* harmony default export */ var classes_Api = (Api_Api);
+// CONCATENATED MODULE: ./src/classes/Users.js
+class Users {
+    constructor(api, commentsList) {
+        this.api = api;
+        this.list = [];
+        this.subscribers = [];
+        this.commentsList = commentsList;
+        this.load();
+      }
+    
+      add(user) {
+        if (this.list.find(lu => lu === user)) return;
+        this.list.push(user);
+        this.commentsList.blockForAuthor(user);
+        return this.api.addUserToList(user);
+      }
+    
+      delete(user) {
+        if (!this.list.find(lu => lu === user)) return;
+        this.list = this.list.filter(lu => lu !== user);
+        this.commentsList.unblockForAuthor(user);
+        this.list.forEach(lu => this.commentsList.blockForAuthor(lu));
+        return this.api.deleteUserFromList(user);
+      }
+    
+      subscribe(subscriber) {
+        this.subscribers.push(subscriber);
+      }
+    
+      notifyAll(event) {
+        this.subscribers.forEach(subscriber => {
+          subscriber.notify({event: event})
+        });
+      }
+      load() {
+        this.api.getBlockedUserList()
+          .then(userlist => {
+            this.list = userlist;
+            this.notifyAll('loaded');
+            this.list.forEach(word => this.commentsList.blockForAuthor(word));
+          });
+      }
+}
 
+/* harmony default export */ var classes_Users = (Users);
 // CONCATENATED MODULE: ./src/classes/Repository.js
 // import config from "./config";
 
 
 
+
 let Repository_keywords = null;
 let api = null;
-function getKeyWords(list) {
+let Repository_users = null;
+function getKeyWords(commentList) {
     if (!Repository_keywords) {
-        Repository_keywords = new classes_KeyWords(getApi(), list);
+        Repository_keywords = new classes_KeyWords(getApi(), commentList);
     }
     return Repository_keywords;
 }
@@ -2161,6 +2205,13 @@ function getApi() {
         api = new classes_Api(connector);
     }
     return api;
+}
+
+function getUsersList(commentList) {
+    if (!Repository_users) {
+        Repository_users = new classes_Users(getApi(), commentList);
+    }
+    return Repository_users;
 }
 
 
@@ -2196,10 +2247,13 @@ customElements.define("keyword-component", keyword_component_KeyWord, { extends:
 
 
 const wordlist_component_template = `
+<div style="padding: 15px; border-bottom: 1px solid grey;">
+<h3 style="margin-bottom: 5px">Bloked words</h3>
 <div  id="add-keyword-button" class="inlblk vertical-top m-reset-width">
-    <input  /><input type="button" value="Dodaj">
+    <input style="margin-bottom: 2px;" /><input type="button" value="Dodaj">
 </div>
 <div id="keyword-list" class="inlblk vertical-top m-reset-width"></div>
+</div>
 `;
 
 class wordlist_component_WordList extends HTMLLIElement {
@@ -2254,6 +2308,101 @@ class wordlist_component_WordList extends HTMLLIElement {
 
 customElements.define("word-list-component", wordlist_component_WordList, { extends: "li" });
 /* harmony default export */ var wordlist_component = (wordlist_component_WordList);
+
+// CONCATENATED MODULE: ./src/components/user.component.js
+
+
+const user_component_template = `
+    <a class="tag affect create" style="margin-rigth:10px;">
+        <p class="inlblk"></p>
+        <i class="fa fa-times red" style="margin-left:5px;"></i>
+    </a>
+`;
+
+class user_component_User extends HTMLDivElement {
+  constructor() {
+    super();
+    this.classList.add("inlblk");
+    this.innerHTML = user_component_template;
+    this.querySelector("p").innerText = this.dataset.name;
+    const closeIcon = this.querySelector("i");
+    closeIcon.addEventListener("click", () => {
+      getUsersList().delete(closeIcon.parentElement.innerText.trim());
+      closeIcon.parentElement.parentElement.remove();
+    });
+  }
+}
+
+customElements.define("user-component", user_component_User, { extends: "div" });
+/* harmony default export */ var user_component = (user_component_User);
+
+// CONCATENATED MODULE: ./src/components/userlist.component.js
+
+
+
+const userlist_component_template = `
+<div style="padding: 15px; border-bottom: 1px solid grey;">
+<h3 style="margin-bottom: 5px">Bloked users</h3>
+<div  id="add-user-button" class="inlblk vertical-top m-reset-width">
+    <input style="margin-bottom: 2px;" /><input type="button" value="Dodaj">
+</div>
+<div id="user-list" class="inlblk vertical-top m-reset-width"></div>
+</div>
+`;
+
+class userlist_component_UserList extends HTMLLIElement {
+  constructor() {
+    super();
+    this.innerHTML = userlist_component_template;
+    getUsersList().subscribe(this);
+
+    this.reload = () => {
+      this.parentElement.replaceChild(
+        document.createElement("li", { is: "user-list-component" }),
+        this
+      );
+    }
+
+    this.handleAddUser = () => {
+      const regex = /[^\w\.!@#$%^&*()\[\]{};:'",<>]/;
+      const user = this.querySelector(
+        "#add-user-button input"
+      ).value.replace(regex, "");
+      if (user.length === 0) return;
+      this.querySelector("#add-user-button input").value = "";
+      getUsersList().add(user).then(() => this.reload());
+    };
+
+    this.notify =  ({event}) => {
+      if (event !== 'loaded') return;
+      this.reload();
+    }
+
+   getUsersList().load();
+  }
+
+  connectedCallback() {
+    const users = getUsersList();
+    const list = this.querySelector("#user-list");
+    list.innerHTML = users.list
+      .map(user => `<div is="user-component" data-name="${user}"></div>`)
+      .join("");
+    document
+      .querySelector("#add-user-button")
+      .addEventListener("click", () => {
+        this.handleAddUser();
+      });
+    document
+      .querySelector("#add-user-button")
+      .addEventListener(
+        "keydown",
+        e => e.keyCode === 13 && this.handleAddUser()
+      );
+  }
+}
+
+customElements.define("user-list-component", userlist_component_UserList, { extends: "li" });
+/* harmony default export */ var userlist_component = (userlist_component_UserList);
 
 // CONCATENATED MODULE: ./src/components/register.component.js
 
@@ -2328,7 +2477,6 @@ customElements.define("register-component", register_component_Register, { exten
 // CONCATENATED MODULE: ./src/components/logout.component.js
 
 
-
 const logout_component_template = `<a>Wyloguj</a>`;
 
 class logout_component_Logout extends HTMLLIElement
@@ -2342,7 +2490,6 @@ class logout_component_Logout extends HTMLLIElement
         }
   
         this.notifyAll = (event) => {
-            console.info(event, 'event logout component');
             this.subscribers.forEach(subscriber => {
                 subscriber.notify({event: event})
             });
@@ -2353,12 +2500,9 @@ class logout_component_Logout extends HTMLLIElement
         this.querySelector('a').addEventListener('click', e => {
             e.preventDefault();
             getApi().logout().then(result => {
-                console.info(result);
-                console.info(!result.success, 'negate loggout result');
                 if (!result.success) {
                     return;
                 }
-                console.info('before notificaton after logged out');
                 this.notifyAll('loggedOut');
             });
         })
@@ -2369,7 +2513,6 @@ customElements.define("logout-component", logout_component_Logout, { extends: "l
 /* harmony default export */ var logout_component = (logout_component_Logout);
 
 // CONCATENATED MODULE: ./src/components/login.component.js
-
 
 
 
@@ -2439,6 +2582,7 @@ customElements.define("login-component", login_component_Login, { extends: "li" 
 
 
 
+
 const app_component_template = `
 <div id="main-div" class="dropdown right" style="margin-left:-230px;">
   <div>
@@ -2468,6 +2612,10 @@ class app_component_App extends HTMLLIElement {
       if (success) {
         this.querySelector('#filter-components').appendChild(
           document.createElement('li', { is: 'word-list-component'})
+        );
+
+        this.querySelector('#filter-components').appendChild(
+          document.createElement('li', { is: 'user-list-component'})
         );
         const logoutComponent = document.createElement('li', { is: 'logout-component'});
         logoutComponent.subscribe(this);
@@ -2505,6 +2653,19 @@ class CommentsList {
             .filter(comment => comment.blocked)
             .forEach(comment => comment.unblockForKeyword(keyword))
     }
+
+
+    blockForAuthor(author) {
+        this.list
+            .filter(comment => !comment.blocked)
+            .forEach(comment => comment.checkAuthor(author))
+    }
+
+    unblockForAuthor(author) {
+        this.list
+            .filter(comment => comment.blocked)
+            .forEach(comment => comment.unblockForAuthor(author))
+    }
 }
 
 CommentsList.blocked_message = 'Ten komentarz został zablokowany';
@@ -2519,14 +2680,14 @@ class Comment {
     }
 
     checkKeyword(keyword) {
-        if (!this.blocked && this.oryginalContent.includes(keyword)) {
+        if (!this.blocked && this.oryginalContent.toLowerCase().includes(keyword.toLowerCase())) {
             this.blocked = true;
             this.element.innerHTML  = CommentsList.blocked_message;
         }
     }
     
     checkAuthor(author) {
-        if (!this.blocked && this.author === author) {
+        if (!this.blocked && this.author.toLowerCase() === author.toLowerCase()) {
             this.blocked = true;
             this.element.innerHTML  = CommentsList.blocked_message;
         } 
@@ -2541,7 +2702,14 @@ class Comment {
     }
 
     unblockForKeyword(keyword) {
-        if (this.blocked && this.oryginalContent.includes(keyword)) {
+        if (this.blocked && this.oryginalContent.toLowerCase().includes(keyword.toLowerCase())) {
+            this.blocked = false;
+            this.element.innerHTML  = this.oryginalContent;
+        }
+    }
+
+    unblockForAuthor(author) {
+        if (this.blocked && this.author.toLowerCase() === author.toLowerCase()) {
             this.blocked = false;
             this.element.innerHTML  = this.oryginalContent;
         }
@@ -2593,6 +2761,7 @@ const app_list = new CommentsList();
 wykop_parser(app_list);
 
 const wordList = getKeyWords(app_list);
+const userList = getUsersList(app_list);
 
 const menu = document.getElementById("openNaturalSearch");
 const menuElement = document.createElement("li", {

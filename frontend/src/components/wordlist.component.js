@@ -2,10 +2,13 @@ import {getKeyWords} from "../classes/Repository";
 import KeyWord from "./keyword.component";
 
 const template = `
+<div style="padding: 15px; border-bottom: 1px solid grey;">
+<h3 style="margin-bottom: 5px">Bloked words</h3>
 <div  id="add-keyword-button" class="inlblk vertical-top m-reset-width">
-    <input  /><input type="button" value="Dodaj">
+    <input style="margin-bottom: 2px;" /><input type="button" value="Dodaj">
 </div>
 <div id="keyword-list" class="inlblk vertical-top m-reset-width"></div>
+</div>
 `;
 
 class WordList extends HTMLLIElement {

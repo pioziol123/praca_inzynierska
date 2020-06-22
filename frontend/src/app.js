@@ -6,12 +6,13 @@
 import App from "./components/app.component";
 import {CommentsList} from './classes/CommentsList';
 import parse from './parsers/wykop-parser.js';
-import {getKeyWords} from './classes/Repository'
+import {getKeyWords, getUsersList} from './classes/Repository'
 
 const list = new CommentsList();
 parse(list);
 
 const wordList = getKeyWords(list);
+const userList = getUsersList(list);
 
 const menu = document.getElementById("openNaturalSearch");
 const menuElement = document.createElement("li", {

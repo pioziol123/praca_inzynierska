@@ -1,24 +1,5 @@
 import Connector from './Connector'
 
-const cookieName = 'userId';
-
-function removeCookie() {
-    document.cookie = `${cookieName}=filter-cookie-hash; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
-}
-
-
-function setCookie(cookie) {
-    const date = (new Date(Date.now() + 1000 * 60 * 60 * 24)).toUTCString();
-    document.cookie = `${cookieName}=${cookie}; expires=${date};`;
-}
-
-function getCookie() {
-    const cookie = document.cookie.split(';')
-        .find(cookie => cookie.includes(cookieName));
-    if (!cookie || cookie.length === 0) return '';
-    return cookie.split('=').pop();
-}
-
 class Api {
     constructor(connector) {
         this.connector = connector;
@@ -55,7 +36,18 @@ class Api {
     async deleteWordFromList(word) {
         return (await this.connector.delete(Connector.keywords, {keyword: word})).success;
     } 
+
+    async addUserToList(user) {
+        return (await this.connector.post(Connector.users, {user_name: user})).success;
+    }
+
+    async deleteUserFromList(user) {
+        return (await this.connector.delete(Connector.users, {blocked_user: user})).success;
+    }
+
+    async getBlockedUserList() {
+        return (await this.connector.get(Connector.users, null)).data.Response.map(user => user.user_name);
+    }
 }
 
 export default Api;
-export {getCookie, removeCookie}

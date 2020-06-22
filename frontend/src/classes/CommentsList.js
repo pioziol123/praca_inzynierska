@@ -19,6 +19,19 @@ class CommentsList {
             .filter(comment => comment.blocked)
             .forEach(comment => comment.unblockForKeyword(keyword))
     }
+
+
+    blockForAuthor(author) {
+        this.list
+            .filter(comment => !comment.blocked)
+            .forEach(comment => comment.checkAuthor(author))
+    }
+
+    unblockForAuthor(author) {
+        this.list
+            .filter(comment => comment.blocked)
+            .forEach(comment => comment.unblockForAuthor(author))
+    }
 }
 
 CommentsList.blocked_message = 'Ten komentarz został zablokowany';
@@ -33,14 +46,14 @@ class Comment {
     }
 
     checkKeyword(keyword) {
-        if (!this.blocked && this.oryginalContent.includes(keyword)) {
+        if (!this.blocked && this.oryginalContent.toLowerCase().includes(keyword.toLowerCase())) {
             this.blocked = true;
             this.element.innerHTML  = CommentsList.blocked_message;
         }
     }
     
     checkAuthor(author) {
-        if (!this.blocked && this.author === author) {
+        if (!this.blocked && this.author.toLowerCase() === author.toLowerCase()) {
             this.blocked = true;
             this.element.innerHTML  = CommentsList.blocked_message;
         } 
@@ -55,7 +68,14 @@ class Comment {
     }
 
     unblockForKeyword(keyword) {
-        if (this.blocked && this.oryginalContent.includes(keyword)) {
+        if (this.blocked && this.oryginalContent.toLowerCase().includes(keyword.toLowerCase())) {
+            this.blocked = false;
+            this.element.innerHTML  = this.oryginalContent;
+        }
+    }
+
+    unblockForAuthor(author) {
+        if (this.blocked && this.author.toLowerCase() === author.toLowerCase()) {
             this.blocked = false;
             this.element.innerHTML  = this.oryginalContent;
         }

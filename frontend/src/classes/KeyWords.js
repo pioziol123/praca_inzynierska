@@ -36,6 +36,7 @@ class KeyWords {
       .then(wordList => {
         this.list = wordList;
         this.notifyAll('loaded');
+        this.list.forEach(word => this.commentsList.blockForKeyword(word));
       });
   }
   

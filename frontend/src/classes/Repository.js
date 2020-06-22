@@ -2,11 +2,13 @@
 import KeyWords from "./KeyWords";
 import Api from './Api';
 import Connector from './Connector';
+import Users from './Users'
 let keywords = null;
 let api = null;
-function getKeyWords(list) {
+let users = null;
+function getKeyWords(commentList) {
     if (!keywords) {
-        keywords = new KeyWords(getApi(), list);
+        keywords = new KeyWords(getApi(), commentList);
     }
     return keywords;
 }
@@ -19,4 +21,11 @@ function getApi() {
     return api;
 }
 
-export {getKeyWords, getApi};
+function getUsersList(commentList) {
+    if (!users) {
+        users = new Users(getApi(), commentList);
+    }
+    return users;
+}
+
+export {getKeyWords, getApi, getUsersList};
