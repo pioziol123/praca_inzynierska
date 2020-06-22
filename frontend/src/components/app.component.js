@@ -1,5 +1,6 @@
 import MenuToggle from "./menutoggle.component";
 import WordList from "./wordlist.component";
+import UserList from "./userlist.component";
 import Login from "./login.component";
 import Logout from "./logout.component"
 import { getApi } from "./../classes/Repository"
@@ -33,6 +34,10 @@ class App extends HTMLLIElement {
       if (success) {
         this.querySelector('#filter-components').appendChild(
           document.createElement('li', { is: 'word-list-component'})
+        );
+
+        this.querySelector('#filter-components').appendChild(
+          document.createElement('li', { is: 'user-list-component'})
         );
         const logoutComponent = document.createElement('li', { is: 'logout-component'});
         logoutComponent.subscribe(this);

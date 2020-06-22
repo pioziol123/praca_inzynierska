@@ -1,4 +1,3 @@
-import WordList from "./wordlist.component";
 import Register from './register.component';
 import { getApi } from "../classes/Repository";
 import Logout from "./logout.component"
