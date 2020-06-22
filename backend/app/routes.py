@@ -218,7 +218,7 @@ def unblock_user():
         if blocked_user is None:
             abort(Response('Nie ma takiego uzytkownika na liscie zablokowanych uzytkownikow.'))
         db.session.delete(blocked_user)
-        Comments.query.filter(Comments.author == blocked_user).delete()
+     #  db.session.query(Comments).filter(Comments.author == blocked_user).delete()
         db.session.commit()
         response_object = {
             'status': 'success',
@@ -231,8 +231,11 @@ def unblock_user():
 
 @application.route('/detection', methods=['GET'])
 def suggest_word():
+    #Initialization for appending string
+    words_list = ""
     user_id = request.cookies.get('userId')
     same_word_count = 4
+    word = request.json.get('word')
     if user_id is not '':
         keywords_obj = Keywords.query.filter_by(added_by=user_id)
         keywords_list = [e.serialize() for e in keywords_obj]
@@ -241,11 +244,14 @@ def suggest_word():
             comments = Comments.query.filter_by(keyword=keyword['word']).filter(Comments.added_by != user_id)
             comments_list = [e.serialize() for e in comments]
             words_topic = words_topic + comments_list
+        #here goes grouping for words topic
+        words_grouped = {}
+        for item in words_topic:
+            if str(item['keyword']) not in words_list:
+                words_list += str(item['keyword']) + " "
+                words_grouped[item['word_topic']] = words_list
         words_count = len(keywords_list)
-        result = collections.defaultdict(list)
-        for i in keywords_list:
-            result[i['word']].append(i['word_topic'])
-        word_analyzer.write_data(words_topic, words_count, words_topic)
+        word_analyzer.write_data(words_grouped, word)
         return 'dupa'
 
 
