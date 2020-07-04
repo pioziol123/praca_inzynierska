@@ -250,7 +250,7 @@ def suggest_word():
                 words_grouped[item['word_topic']] = words_list
         words_count = len(keywords_list)
         recommended_word = word_analyzer.write_data(words_grouped,words_count, word)
-        return recommended_word
+        return jsonify({'Response': recommended_word})
     else:
         return Response("Brak dostepu", status=405, mimetype='application/json')
 

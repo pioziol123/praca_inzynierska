@@ -4,4 +4,3 @@ venv
 .idea
 /venv/
 __pychache__/
-config.py
