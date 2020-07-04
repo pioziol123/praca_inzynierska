@@ -56,6 +56,10 @@ class Api {
     async addCommentsUser(user) {
         return (await this.connector.post(Connector.comments_user, {blocked_user: user})).success;
     }
+
+    async getDetections() {
+        return (await this.connector.get(Connector))
+    }
 }
 
 export default Api;

@@ -2145,6 +2145,10 @@ class Api_Api {
     async addCommentsUser(user) {
         return (await this.connector.post(classes_Connector.comments_user, {blocked_user: user})).success;
     }
+
+    async getDetections() {
+        return (await this.connector.get(classes_Connector))
+    }
 }
 
 /* harmony default export */ var classes_Api = (Api_Api);
@@ -2193,7 +2197,52 @@ class Users {
 }
 
 /* harmony default export */ var classes_Users = (Users);
+// CONCATENATED MODULE: ./src/classes/Detecteds.js
+
+
+class Detecteds_Detecteds {
+    constructor(api) {
+      this.api = api;
+      this.list = ["dupa", "od"];
+      this.subscribers = [];
+    }
+  
+    delete(detected) {
+      if (!this.list.find(dw => dw === detected)) return;
+      this.list = this.list.filter(dw => dw !== detected);
+      getKeyWords().add(detected).then(() =>  {
+        this.notifyAll('detection-matched');
+      });
+    }
+  
+    subscribe(subscriber) {
+      this.subscribers.push(subscriber);
+    }
+  
+    notifyAll(event) {
+      this.subscribers.forEach(subscriber => {
+        subscriber.notify({event: event})
+      });
+    }
+
+    notify() {
+        this.load();
+    }
+    load() {
+      this.api.getDetections()
+        .then(wordList => {
+          this.list = wordList;
+          this.notifyAll('loaded');
+        });
+    }
+    
+  }
+  
+  /* harmony default export */ var classes_Detecteds = (Detecteds_Detecteds);
+
 // CONCATENATED MODULE: ./src/classes/Repository.js
+
+
 
 
 
@@ -2201,6 +2250,8 @@ class Users {
 let Repository_keywords = null;
 let api = null;
 let Repository_users = null;
+let Repository_detecteds = null;
+
 function getKeyWords(commentList) {
     if (!Repository_keywords) {
         Repository_keywords = new classes_KeyWords(getApi(), commentList);
@@ -2221,6 +2272,13 @@ function getUsersList(commentList) {
         Repository_users = new classes_Users(getApi(), commentList);
     }
     return Repository_users;
+}
+
+function getDetected() {
+    if (!Repository_detecteds) {
+        Repository_detecteds = new classes_Detecteds(getApi());
+    }
+    return Repository_detecteds;
 }
 
 
@@ -2584,7 +2642,79 @@ class login_component_Login extends HTMLLIElement {
 customElements.define("login-component", login_component_Login, { extends: "li" });
 /* harmony default export */ var login_component = (login_component_Login);
 
+// CONCATENATED MODULE: ./src/components/detected.component.js
+
+
+const detected_component_template = `
+    <a class="tag affect create" style="margin-rigth:10px;">
+        <p class="inlblk"></p>
+    </a>
+`;
+
+class detected_component_Detected extends HTMLDivElement {
+  constructor() {
+    super();
+    this.classList.add("inlblk");
+    this.innerHTML = detected_component_template;
+    this.querySelector("p").innerText = this.dataset.name;
+    const detectedWord = this.querySelector("p");
+    detectedWord.addEventListener("click", () => {
+      getDetected().delete(detectedWord.innerText.trim());
+      detectedWord.parentElement.remove();
+    });
+  }
+}
+
+customElements.define("detected-component", detected_component_Detected, { extends: "div" });
+/* harmony default export */ var detected_component = (detected_component_Detected);
+
+// CONCATENATED MODULE: ./src/components/detectedlist.component.js
+
+
+
+const detectedlist_component_template = `
+<div style="padding: 15px; border-bottom: 1px solid grey;">
+<h3 style="margin-bottom: 5px">Sugerowane słowa</h3>
+<div id="detected-list" class="inlblk vertical-top m-reset-width"></div>
+</div>
+`;
+
+class detectedlist_component_DetectedList extends HTMLLIElement {
+  constructor() {
+    super();
+    getDetected().subscribe(this);
+    this.innerHTML = detectedlist_component_template;
+
+    this.reload = () => {
+      this.parentElement.replaceChild(
+        document.createElement("li", { is: "detected-list-component" }),
+        this
+      );
+    }
+
+    this.notify =  ({event}) => {
+      if (event !== 'loaded') return;
+      this.reload();
+    }
+  }
+
+  connectedCallback() {
+    const detecteds = getDetected().list ||  [];
+    console.debug(detecteds.map(detected => `<div is="detected-component" data-name="${detected}"></div>`).join(""), "detecteds");
+    const list = this.querySelector("#detected-list");
+    console.debug(list, "list");
+    list.innerHTML = detecteds
+      .map(detected => `<div is="detected-component" data-name="${detected}"></div>`)
+      .join("");
+    console.debug(list.textContent, "list");
+  }
+}
+
+customElements.define("detected-list-component", detectedlist_component_DetectedList, { extends: "li" });
+/* harmony default export */ var detectedlist_component = (detectedlist_component_DetectedList);
+
 // CONCATENATED MODULE: ./src/components/app.component.js
+
 
 
 
@@ -2626,6 +2756,11 @@ class app_component_App extends HTMLLIElement {
         this.querySelector('#filter-components').appendChild(
           document.createElement('li', { is: 'user-list-component'})
         );
+
+        this.querySelector('#filter-components').appendChild(
+          document.createElement('li', { is: 'detected-list-component'})
+        );
+        
         const logoutComponent = document.createElement('li', { is: 'logout-component'});
         logoutComponent.subscribe(this);
         this.querySelector('#filter-components').appendChild(logoutComponent);

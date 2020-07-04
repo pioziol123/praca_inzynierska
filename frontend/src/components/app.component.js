@@ -2,8 +2,9 @@ import MenuToggle from "./menutoggle.component";
 import WordList from "./wordlist.component";
 import UserList from "./userlist.component";
 import Login from "./login.component";
-import Logout from "./logout.component"
-import { getApi } from "./../classes/Repository"
+import Logout from "./logout.component";
+import Detected from "./detectedlist.component";
+import { getApi } from "./../classes/Repository";
 
 const template = `
 <div id="main-div" class="dropdown right" style="margin-left:-230px;">
@@ -39,6 +40,11 @@ class App extends HTMLLIElement {
         this.querySelector('#filter-components').appendChild(
           document.createElement('li', { is: 'user-list-component'})
         );
+
+        this.querySelector('#filter-components').appendChild(
+          document.createElement('li', { is: 'detected-list-component'})
+        );
+        
         const logoutComponent = document.createElement('li', { is: 'logout-component'});
         logoutComponent.subscribe(this);
         this.querySelector('#filter-components').appendChild(logoutComponent);

@@ -1,10 +1,14 @@
 import KeyWords from "./KeyWords";
 import Api from './Api';
 import Connector from './Connector';
-import Users from './Users'
+import Users from './Users';
+import Detecteds from './Detecteds';
+
 let keywords = null;
 let api = null;
 let users = null;
+let detecteds = null;
+
 function getKeyWords(commentList) {
     if (!keywords) {
         keywords = new KeyWords(getApi(), commentList);
@@ -27,4 +31,11 @@ function getUsersList(commentList) {
     return users;
 }
 
-export {getKeyWords, getApi, getUsersList};
+function getDetected() {
+    if (!detecteds) {
+        detecteds = new Detecteds(getApi());
+    }
+    return detecteds;
+}
+
+export {getKeyWords, getApi, getUsersList, getDetected};
