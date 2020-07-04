@@ -1,6 +1,8 @@
 import {Comment} from '../classes/CommentsList';
 
 function parse(list) {
+    list.tag = document.querySelectorAll('.tag')[2].textContent;
+    console.debug(list.tag);
     [...document.querySelectorAll('#itemsStream .dC') || []]
         .filter(element => element.querySelector('.author .showProfileSummary'))
         .forEach(function (element) {

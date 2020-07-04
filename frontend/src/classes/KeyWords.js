@@ -11,7 +11,7 @@ class KeyWords {
     if (this.list.find(kw => kw === word)) return;
     this.list.push(word);
     this.commentsList.blockForKeyword(word);
-    return this.api.addWordToList(word);
+    return this.api.addWordToList(word, this.commentsList.tag);
   }
 
   delete(word) {

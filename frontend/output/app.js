@@ -2002,7 +2002,7 @@ class KeyWords {
     if (this.list.find(kw => kw === word)) return;
     this.list.push(word);
     this.commentsList.blockForKeyword(word);
-    return this.api.addWordToList(word);
+    return this.api.addWordToList(word, this.commentsList.tag);
   }
 
   delete(word) {
@@ -2082,6 +2082,8 @@ Connector_Connector.users = 'blocks';
 Connector_Connector.register = 'user';
 Connector_Connector.login = 'users/login';
 Connector_Connector.logout = 'users/logout';
+Connector_Connector.comments_word = 'comments_word';
+Connector_Connector.comments_user = 'comments_user';
 Connector_Connector.url = "http://127.0.0.1/"
 /* harmony default export */ var classes_Connector = (Connector_Connector);
 // CONCATENATED MODULE: ./src/classes/Api.js
@@ -2116,16 +2118,16 @@ class Api_Api {
         return (await this.connector.get(classes_Connector.keywords, null)).data.map(word => word.word)
     }
 
-    async addWordToList(word) {
-        return (await this.connector.post(classes_Connector.keywords, {keyword: word})).success;
+    async addWordToList(word, tag) {
+        return (await this.connector.post(classes_Connector.keywords, {keyword: word, word_topic: tag})).success;
     }
 
     async deleteWordFromList(word) {
         return (await this.connector.delete(classes_Connector.keywords, {keyword: word})).success;
     } 
 
-    async addUserToList(user) {
-        return (await this.connector.post(classes_Connector.users, {user_name: user})).success;
+    async addUserToList(user, tag) {
+        return (await this.connector.post(classes_Connector.users, {user_name: user, word_topic: tag})).success;
     }
 
     async deleteUserFromList(user) {
@@ -2134,6 +2136,14 @@ class Api_Api {
 
     async getBlockedUserList() {
         return (await this.connector.get(classes_Connector.users, null)).data.Response.map(user => user.user_name);
+    }
+
+    async addCommentsWord(word) {
+        return (await this.connector.post(classes_Connector.comments_word, {keyword: word})).success;
+    }
+
+    async addCommentsUser(user) {
+        return (await this.connector.post(classes_Connector.comments_user, {blocked_user: user})).success;
     }
 }
 
@@ -2152,7 +2162,7 @@ class Users {
         if (this.list.find(lu => lu === user)) return;
         this.list.push(user);
         this.commentsList.blockForAuthor(user);
-        return this.api.addUserToList(user);
+        return this.api.addUserToList(user, this.commentsList.tag);
       }
     
       delete(user) {
@@ -2184,7 +2194,6 @@ class Users {
 
 /* harmony default export */ var classes_Users = (Users);
 // CONCATENATED MODULE: ./src/classes/Repository.js
-// import config from "./config";
 
 
 
@@ -2632,9 +2641,12 @@ customElements.define("filter-app-component", app_component_App, { extends: "li"
 /* harmony default export */ var app_component = (app_component_App);
 
 // CONCATENATED MODULE: ./src/classes/CommentsList.js
+
+
 class CommentsList {
     constructor() {
         this.list = [];
+        this.tag = '';
     }
 
 
@@ -2671,7 +2683,7 @@ class CommentsList {
 CommentsList.blocked_message = 'Ten komentarz został zablokowany';
     
 
-class Comment {
+class CommentsList_Comment {
     constructor(element, author) {
         this.element = element;
         this.blocked = false;
@@ -2683,6 +2695,7 @@ class Comment {
         if (!this.blocked && this.oryginalContent.toLowerCase().includes(keyword.toLowerCase())) {
             this.blocked = true;
             this.element.innerHTML  = CommentsList.blocked_message;
+            getApi().addCommentsWord(keyword);
         }
     }
     
@@ -2690,6 +2703,7 @@ class Comment {
         if (!this.blocked && this.author.toLowerCase() === author.toLowerCase()) {
             this.blocked = true;
             this.element.innerHTML  = CommentsList.blocked_message;
+            getApi().addCommentsUser(author);
         } 
     }
 
@@ -2721,12 +2735,14 @@ class Comment {
 
 
 function parse(list) {
+    list.tag = document.querySelectorAll('.tag')[2].textContent;
+    console.debug(list.tag);
     [...document.querySelectorAll('#itemsStream .dC') || []]
         .filter(element => element.querySelector('.author .showProfileSummary'))
         .forEach(function (element) {
             const author = element.querySelector('.author .showProfileSummary').textContent;
             const contentElement = element.querySelector('.text');
-            const comment = new Comment(contentElement, author);
+            const comment = new CommentsList_Comment(contentElement, author);
             list.append(comment);
             addPicker(contentElement, comment);
     });

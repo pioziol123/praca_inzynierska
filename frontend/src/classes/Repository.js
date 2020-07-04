@@ -1,4 +1,3 @@
-// import config from "./config";
 import KeyWords from "./KeyWords";
 import Api from './Api';
 import Connector from './Connector';
