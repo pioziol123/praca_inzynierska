@@ -21,7 +21,7 @@ def write_data(dataset, y, words):
         count_matrix = count.fit_transform(df['Slowa'])
 
     except ValueError:
-        return ' '
+        return '--'
     # generating the cosine similarity matrix
     cosine_sim = cosine_similarity(count_matrix, count_matrix)
     cosine_sim = dataset[0]
