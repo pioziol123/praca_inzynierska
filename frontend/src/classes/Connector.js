@@ -38,6 +38,7 @@ class Connector {
 Connector.keywords = 'keywords';
 Connector.users = 'blocks';
 Connector.register = 'user';
+Connector.detection = 'detection';
 Connector.login = 'users/login';
 Connector.logout = 'users/logout';
 Connector.comments_word = 'comments_word';

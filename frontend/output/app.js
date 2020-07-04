@@ -2080,6 +2080,7 @@ class Connector_Connector {
 Connector_Connector.keywords = 'keywords';
 Connector_Connector.users = 'blocks';
 Connector_Connector.register = 'user';
+Connector_Connector.detection = 'detection';
 Connector_Connector.login = 'users/login';
 Connector_Connector.logout = 'users/logout';
 Connector_Connector.comments_word = 'comments_word';
@@ -2147,7 +2148,9 @@ class Api_Api {
     }
 
     async getDetections() {
-        return (await this.connector.get(classes_Connector))
+        // result = (await this.connector.get(Connector.detection)).data.Response;
+        // return result !== '--' ? [result] || [];
+        return ['wacek', 'biurokrata', '1', '2', '3'];
     }
 }
 
@@ -2203,8 +2206,9 @@ class Users {
 class Detecteds_Detecteds {
     constructor(api) {
       this.api = api;
-      this.list = ["dupa", "od"];
+      this.list = [];
       this.subscribers = [];
+      this.load();
     }
   
     delete(detected) {
@@ -2230,8 +2234,9 @@ class Detecteds_Detecteds {
     }
     load() {
       this.api.getDetections()
-        .then(wordList => {
-          this.list = wordList;
+        .then(detections => {
+          console.info(detections, detections.filter(detected => getKeyWords().list.includes(detected)), 'detections');
+          this.list = detections.filter(detected => getKeyWords().list.includes(detected));
           this.notifyAll('loaded');
         });
     }
@@ -2327,6 +2332,7 @@ class wordlist_component_WordList extends HTMLLIElement {
   constructor() {
     super();
     getKeyWords().subscribe(this);
+
     this.innerHTML = wordlist_component_template;
 
     this.reload = () => {
@@ -2352,6 +2358,7 @@ class wordlist_component_WordList extends HTMLLIElement {
     }
 
     getKeyWords().load();
+    
   }
 
   connectedCallback() {

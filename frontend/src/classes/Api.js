@@ -58,7 +58,9 @@ class Api {
     }
 
     async getDetections() {
-        return (await this.connector.get(Connector))
+        // result = (await this.connector.get(Connector.detection)).data.Response;
+        // return result !== '--' ? [result] || [];
+        return ['wacek', 'biurokrata', '1', '2', '3'];
     }
 }
 

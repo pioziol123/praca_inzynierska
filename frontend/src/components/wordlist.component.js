@@ -1,4 +1,4 @@
-import {getKeyWords} from "../classes/Repository";
+import { getKeyWords } from "../classes/Repository";
 import KeyWord from "./keyword.component";
 
 const template = `
@@ -15,6 +15,7 @@ class WordList extends HTMLLIElement {
   constructor() {
     super();
     getKeyWords().subscribe(this);
+
     this.innerHTML = template;
 
     this.reload = () => {
@@ -40,6 +41,7 @@ class WordList extends HTMLLIElement {
     }
 
     getKeyWords().load();
+    
   }
 
   connectedCallback() {

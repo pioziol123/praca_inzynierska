@@ -3,8 +3,9 @@ import { getKeyWords } from './Repository';
 class Detecteds {
     constructor(api) {
       this.api = api;
-      this.list = ["dupa", "od"];
+      this.list = [];
       this.subscribers = [];
+      this.load();
     }
   
     delete(detected) {
@@ -30,8 +31,9 @@ class Detecteds {
     }
     load() {
       this.api.getDetections()
-        .then(wordList => {
-          this.list = wordList;
+        .then(detections => {
+          console.info(detections, detections.filter(detected => getKeyWords().list.includes(detected)), 'detections');
+          this.list = detections.filter(detected => getKeyWords().list.includes(detected));
           this.notifyAll('loaded');
         });
     }
