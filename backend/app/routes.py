@@ -218,7 +218,6 @@ def unblock_user():
         if blocked_user is None:
             abort(Response('Nie ma takiego uzytkownika na liscie zablokowanych uzytkownikow.'))
         db.session.delete(blocked_user)
-     #  db.session.query(Comments).filter(Comments.author == blocked_user).delete()
         db.session.commit()
         response_object = {
             'status': 'success',
@@ -234,9 +233,8 @@ def suggest_word():
     #Initialization for appending string
     words_list = ""
     user_id = request.cookies.get('userId')
-    same_word_count = 4
     word = request.json.get('word')
-    if user_id is not '':
+    if user_id is not None:
         keywords_obj = Keywords.query.filter_by(added_by=user_id)
         keywords_list = [e.serialize() for e in keywords_obj]
         words_topic = []
@@ -251,8 +249,10 @@ def suggest_word():
                 words_list += str(item['keyword']) + " "
                 words_grouped[item['word_topic']] = words_list
         words_count = len(keywords_list)
-        word_analyzer.write_data(words_grouped, word)
-        return 'dupa'
+        recommended_word = word_analyzer.write_data(words_grouped,words_count, word)
+        return recommended_word
+    else:
+        return Response("Brak dostepu", status=405, mimetype='application/json')
 
 
 @application.route('/', methods=['GET'])

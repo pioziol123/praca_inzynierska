@@ -19,3 +19,5 @@ def write_data(dataset, y, words):
 
     # generating the cosine similarity matrix
     cosine_sim = cosine_similarity(count_matrix, count_matrix)
+
+    return cosine_sim
