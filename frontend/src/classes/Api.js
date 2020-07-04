@@ -29,16 +29,16 @@ class Api {
         return (await this.connector.get(Connector.keywords, null)).data.map(word => word.word)
     }
 
-    async addWordToList(word) {
-        return (await this.connector.post(Connector.keywords, {keyword: word})).success;
+    async addWordToList(word, tag) {
+        return (await this.connector.post(Connector.keywords, {keyword: word, word_topic: tag})).success;
     }
 
     async deleteWordFromList(word) {
         return (await this.connector.delete(Connector.keywords, {keyword: word})).success;
     } 
 
-    async addUserToList(user) {
-        return (await this.connector.post(Connector.users, {user_name: user})).success;
+    async addUserToList(user, tag) {
+        return (await this.connector.post(Connector.users, {user_name: user, word_topic: tag})).success;
     }
 
     async deleteUserFromList(user) {
@@ -47,6 +47,14 @@ class Api {
 
     async getBlockedUserList() {
         return (await this.connector.get(Connector.users, null)).data.Response.map(user => user.user_name);
+    }
+
+    async addCommentsWord(word) {
+        return (await this.connector.post(Connector.comments_word, {keyword: word})).success;
+    }
+
+    async addCommentsUser(user) {
+        return (await this.connector.post(Connector.comments_user, {blocked_user: user})).success;
     }
 }
 

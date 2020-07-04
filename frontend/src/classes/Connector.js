@@ -40,5 +40,7 @@ Connector.users = 'blocks';
 Connector.register = 'user';
 Connector.login = 'users/login';
 Connector.logout = 'users/logout';
+Connector.comments_word = 'comments_word';
+Connector.comments_user = 'comments_user';
 Connector.url = "http://127.0.0.1/"
 export default Connector;

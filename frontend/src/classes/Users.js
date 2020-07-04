@@ -11,7 +11,7 @@ class Users {
         if (this.list.find(lu => lu === user)) return;
         this.list.push(user);
         this.commentsList.blockForAuthor(user);
-        return this.api.addUserToList(user);
+        return this.api.addUserToList(user, this.commentsList.tag);
       }
     
       delete(user) {

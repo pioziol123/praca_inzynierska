@@ -1,6 +1,9 @@
+import { getApi } from './Repository';
+
 class CommentsList {
     constructor() {
         this.list = [];
+        this.tag = '';
     }
 
 
@@ -49,6 +52,7 @@ class Comment {
         if (!this.blocked && this.oryginalContent.toLowerCase().includes(keyword.toLowerCase())) {
             this.blocked = true;
             this.element.innerHTML  = CommentsList.blocked_message;
+            getApi().addCommentsWord(keyword);
         }
     }
     
@@ -56,6 +60,7 @@ class Comment {
         if (!this.blocked && this.author.toLowerCase() === author.toLowerCase()) {
             this.blocked = true;
             this.element.innerHTML  = CommentsList.blocked_message;
+            getApi().addCommentsUser(author);
         } 
     }
 
