@@ -22,20 +22,17 @@ class DetectedList extends HTMLLIElement {
     }
 
     this.notify =  ({event}) => {
-      if (event !== 'loaded') return;
+      if (event !== 'loaded2') return;
       this.reload();
     }
   }
 
   connectedCallback() {
     const detecteds = getDetected().list ||  [];
-    console.debug(detecteds.map(detected => `<div is="detected-component" data-name="${detected}"></div>`).join(""), "detecteds");
     const list = this.querySelector("#detected-list");
-    console.debug(list, "list");
     list.innerHTML = detecteds
       .map(detected => `<div is="detected-component" data-name="${detected}"></div>`)
       .join("");
-    console.debug(list.textContent, "list");
   }
 }
 

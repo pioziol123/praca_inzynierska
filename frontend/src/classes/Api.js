@@ -60,7 +60,7 @@ class Api {
     async getDetections() {
         // result = (await this.connector.get(Connector.detection)).data.Response;
         // return result !== '--' ? [result] || [];
-        return ['wacek', 'biurokrata', '1', '2', '3'];
+        return ['wacek', 'biurokrata', '1', '2', '3', '33'];
     }
 }
 

@@ -32,9 +32,8 @@ class Detecteds {
     load() {
       this.api.getDetections()
         .then(detections => {
-          console.info(detections, detections.filter(detected => getKeyWords().list.includes(detected)), 'detections');
-          this.list = detections.filter(detected => getKeyWords().list.includes(detected));
-          this.notifyAll('loaded');
+          this.list = detections.filter(detected => !getKeyWords().list.includes(detected));
+          this.notifyAll('loaded2');
         });
     }
     

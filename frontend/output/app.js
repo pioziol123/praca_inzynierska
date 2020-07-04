@@ -2150,7 +2150,7 @@ class Api_Api {
     async getDetections() {
         // result = (await this.connector.get(Connector.detection)).data.Response;
         // return result !== '--' ? [result] || [];
-        return ['wacek', 'biurokrata', '1', '2', '3'];
+        return ['wacek', 'biurokrata', '1', '2', '3', '33'];
     }
 }
 
@@ -2235,9 +2235,8 @@ class Detecteds_Detecteds {
     load() {
       this.api.getDetections()
         .then(detections => {
-          console.info(detections, detections.filter(detected => getKeyWords().list.includes(detected)), 'detections');
-          this.list = detections.filter(detected => getKeyWords().list.includes(detected));
-          this.notifyAll('loaded');
+          this.list = detections.filter(detected => !getKeyWords().list.includes(detected));
+          this.notifyAll('loaded2');
         });
     }
     
@@ -2332,7 +2331,7 @@ class wordlist_component_WordList extends HTMLLIElement {
   constructor() {
     super();
     getKeyWords().subscribe(this);
-
+    getDetected().subscribe(this);
     this.innerHTML = wordlist_component_template;
 
     this.reload = () => {
@@ -2353,7 +2352,7 @@ class wordlist_component_WordList extends HTMLLIElement {
     };
 
     this.notify =  ({event}) => {
-      if (event !== 'loaded') return;
+      if (event === 'loaded2') return;
       this.reload();
     }
 
@@ -2700,20 +2699,17 @@ class detectedlist_component_DetectedList extends HTMLLIElement {
     }
 
     this.notify =  ({event}) => {
-      if (event !== 'loaded') return;
+      if (event !== 'loaded2') return;
       this.reload();
     }
   }
 
   connectedCallback() {
     const detecteds = getDetected().list ||  [];
-    console.debug(detecteds.map(detected => `<div is="detected-component" data-name="${detected}"></div>`).join(""), "detecteds");
     const list = this.querySelector("#detected-list");
-    console.debug(list, "list");
     list.innerHTML = detecteds
       .map(detected => `<div is="detected-component" data-name="${detected}"></div>`)
       .join("");
-    console.debug(list.textContent, "list");
   }
 }
 
@@ -2878,7 +2874,6 @@ class CommentsList_Comment {
 
 function parse(list) {
     list.tag = document.querySelectorAll('.tag')[2].textContent;
-    console.debug(list.tag);
     [...document.querySelectorAll('#itemsStream .dC') || []]
         .filter(element => element.querySelector('.author .showProfileSummary'))
         .forEach(function (element) {

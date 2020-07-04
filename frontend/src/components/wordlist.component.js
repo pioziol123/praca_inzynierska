@@ -1,4 +1,4 @@
-import { getKeyWords } from "../classes/Repository";
+import { getKeyWords, getDetected} from "../classes/Repository";
 import KeyWord from "./keyword.component";
 
 const template = `
@@ -15,7 +15,7 @@ class WordList extends HTMLLIElement {
   constructor() {
     super();
     getKeyWords().subscribe(this);
-
+    getDetected().subscribe(this);
     this.innerHTML = template;
 
     this.reload = () => {
@@ -36,7 +36,7 @@ class WordList extends HTMLLIElement {
     };
 
     this.notify =  ({event}) => {
-      if (event !== 'loaded') return;
+      if (event === 'loaded2') return;
       this.reload();
     }
 
