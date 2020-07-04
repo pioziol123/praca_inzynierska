@@ -233,7 +233,6 @@ def suggest_word():
     #Initialization for appending string
     words_list = ""
     user_id = request.cookies.get('userId')
-    word = request.json.get('word')
     if user_id is not None:
         keywords_obj = Keywords.query.filter_by(added_by=user_id)
         keywords_list = [e.serialize() for e in keywords_obj]
@@ -249,7 +248,7 @@ def suggest_word():
                 words_list += str(item['keyword']) + " "
                 words_grouped[item['word_topic']] = words_list
         words_count = len(keywords_list)
-        recommended_word = word_analyzer.write_data(words_grouped,words_count, word)
+        recommended_word = word_analyzer.write_data(words_grouped,words_count, words_list)
         return jsonify({'Response': recommended_word})
     else:
         return Response("Brak dostepu", status=405, mimetype='application/json')
